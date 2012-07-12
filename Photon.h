@@ -14,18 +14,28 @@
 
 using namespace std;
 
-#ifndef PHOTON
-#define PHOTON
+#ifndef photon
+#define photon
 
-class PHOTON 
+class Photon
 {
  public: //variables
   Double_t initial_photon_energy;
   Double_t cross_section; //will eventually give more to it!
   Double_t detector_length;
+  Double_t N_a;
+  Double_t dx;
+  TRandom3 anything; //for getting a random number
+  Double_t random_number;
+  Double_t Prob;
+  
+  Photon();//constructor for default photon object
+
+  Photon(Double_t); //constructor for photon object
 
  public: //functions
-  int PhotonStepper();
+  int PhotonStepperSF();
+  int PhotonStepperSlick();
   int SetCrossSection();
   int SetPhotonEnergy();
   int GetCrossSection();

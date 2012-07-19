@@ -21,25 +21,29 @@ class Photon
 {
  private: //variables
   //  Double_t initial_photon_energy;
-  Double_t cross_section; //will eventually give more to it!
-  static Double_t detector_length;
-  static Double_t N_a;
+  Double_t mu; //will eventually give more to it!
+  Double_t detector_length;
+  static Double_t n_a;
   static Double_t dx;
-  TRandom3 anything; //for getting a random number
   Double_t random_number;
-  Double_t Prob;
+  Double_t prob;
+
+
   
 
  public: //functions
-  int PhotonStepperSF();
+
   int PhotonStepperSlick();
-  int SetCrossSection(Double_t new_cross_section);
-  //   int SetPhotonEnergy();
-  int GetCrossSection();
+  int PhotonStepperSF();
+  int GetMu();
+  int SetMu(Double_t mu);
+  int SetDetectorLength(Double_t detector_length);
+  int GetDetectorLength();
+  int Looper();
 
   Photon();//constructor for default photon object
 
-  Photon(Double_t new_cross_section); //constructor for photon object
+  Photon(Double_t mu,Double_t detector_length); //constructor for photon object
 
 };
 

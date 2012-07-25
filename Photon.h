@@ -11,6 +11,10 @@
 #include "TAxis.h"
 #include "TCanvas.h"
 #include "TH1D.h"
+#include "TSpline.h"
+#include <string>
+#include "RLinearInterpolant.h"
+#include "TF1.h"
 
 using namespace std;
 
@@ -20,31 +24,39 @@ using namespace std;
 class Photon
 {
  private: //variables
-  //  Double_t initial_photon_energy;
-  Double_t mu; //will eventually give more to it!
+  Double_t initial_photon_energy;
+  Double_t mu;
   Double_t detector_length;
   static Double_t n_a;
   static Double_t dx;
+  static Double_t number;
   Double_t random_number;
   Double_t prob;
+  RLinearInterpolant *mu_spline;
+  RLinearInterpolant *coherent_spline;
+  RLinearInterpolant *incoherent_spline;
+  RLinearInterpolant *photoelec_spline;
+  RLinearInterpolant *pairprod_spline;
+  TF1 *thetafinder;
+  Double_t new_theta;
 
-
-  
-
- public: //functions
-
-  int PhotonStepperSlick();
-  int PhotonStepperSF();
-  int GetMu();
-  int SetMu(Double_t mu);
-  int SetDetectorLength(Double_t detector_length);
-  int GetDetectorLength();
-  int Looper();
-
+ public: //constructors
   Photon();//constructor for default photon object
 
-  Photon(Double_t mu,Double_t detector_length); //constructor for photon object
+  Photon(Double_t mu,Double_t detector_length,Double_t initial_photon_energy); //constructor for photon object
 
+ public: //methods
+  Double_t PhotonStepperSlick();
+  Double_t InteractionFinder(Double_t initial_photon_energy);
+  Double_t ThetaFinder(Double_t initial_photon_energy);
+  void SetMu(Double_t mu);
+  void SetSplineMu(Double_t initial_photon_energy);
+  Double_t GetMu();
+  void SetDetectorLength(Double_t detector_length);
+  Double_t GetDetectorLength(); 
+  void SetInitialPhotonEnergy(Double_t initial_photon_energy);
+  Double_t GetInitialPhotonEnergy();
+  void FileReader();
 };
 
 #endif

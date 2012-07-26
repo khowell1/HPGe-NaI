@@ -8,7 +8,7 @@ int main() {
   Double_t result_slick;
   Double_t mu;
   Double_t detector_length;
-  Double_t initial_photon_energy;
+  Double_t photon_energy;
   Double_t sum_slick_escape=0;
   Double_t sumsq_slick_escape=0;
   Double_t std_slick_escape;
@@ -28,22 +28,22 @@ int main() {
       cout<<"detector length: ";
       cin>>detector_length;
       cout<<"photon energy: ";
-      cin>>initial_photon_energy;
+      cin>>photon_energy;
       photon.SetMu(mu);
       photon.SetDetectorLength(detector_length);
-      initial_photon_energy=initial_photon_energy/1000.0;
-      photon.SetInitialPhotonEnergy(initial_photon_energy);
+      photon_energy=photon_energy/1000.0;
+      photon.SetInitialPhotonEnergy(photon_energy);
       loop_ender=1;
 	}
     else if (response==2) { //use spline to get mu
       cout<<"detector length: ";
       cin>>detector_length;
       cout<<"photon energy: ";
-      cin>>initial_photon_energy;
-      initial_photon_energy=initial_photon_energy/1000.0;
-      photon.SetSplineMu(initial_photon_energy);
+      cin>>photon_energy;
+      photon_energy=photon_energy/1000.0;
+      photon.SetSplineMu(photon_energy);
       photon.SetDetectorLength(detector_length);
-      photon.SetInitialPhotonEnergy(initial_photon_energy);
+      photon.SetInitialPhotonEnergy(photon_energy);
       loop_ender=1;
     }
     else {
@@ -51,9 +51,11 @@ int main() {
       cin>>response;
     }
   }
+  photon.SetPhotonProperties(Double_t photonproperties);
+  photon.GetPhotonProperties();
   //  cout<<photon.GetMu()<<endl;
-  cout<<photon.InteractionFinder(initial_photon_energy)<<endl;
-  photon.ThetaFinder(initial_photon_energy);
+  //cout<<photon.InteractionFinder(photon_energy)<<endl;
+  //photon.ThetaFinder(photon_energy);
  //  TH1D *hist_slick=new TH1D("hist","Slick MC class method",100,0,detector_length*1.01);
  //  for (int n=0;n<number;n++) {
  //    result_slick=photon.PhotonStepperSlick();

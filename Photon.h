@@ -1,4 +1,4 @@
-//beautiful header file for Kaitlin Howell's summer project!
+//beautiful header file for Kaitlin Howell's summer project! man header file
 
 #include <math.h>
 #include <stdio.h>
@@ -24,38 +24,55 @@ using namespace std;
 class Photon
 {
  private: //variables
-  Double_t initial_photon_energy;
-  Double_t mu;
-  Double_t detector_length;
+  //static variables
   static Double_t n_a;
   static Double_t dx;
   static Double_t number;
-  Double_t random_number;
-  Double_t prob;
+  static Double_t PI;
+  static Double_t c;
+  static Double_t electron_mass;
+  static Double_t MeV_Jules_convert;
+  //variables that are determined from main 
+  Double_t photon_energy;
+  Double_t mu;
+  Double_t detector_length;
+  //variables within classes
+  TF1 *thetafinder; //a tf1 object 
+  Double_t theta;
+  Double_t phi; 
+  Double_t photonproperties [4];  //[photon energy,distance,theta,phi]
+  //objects from rich's interpolator
   RLinearInterpolant *mu_spline;
   RLinearInterpolant *coherent_spline;
   RLinearInterpolant *incoherent_spline;
   RLinearInterpolant *photoelec_spline;
   RLinearInterpolant *pairprod_spline;
-  TF1 *thetafinder;
-  Double_t new_theta;
+
 
  public: //constructors
   Photon();//constructor for default photon object
 
-  Photon(Double_t mu,Double_t detector_length,Double_t initial_photon_energy); //constructor for photon object
+  Photon(Double_t mu,Double_t detector_length,Double_t photon_energy); //constructor for photon object
+  ~Photon();
 
  public: //methods
   Double_t PhotonStepperSlick();
-  Double_t InteractionFinder(Double_t initial_photon_energy);
-  Double_t ThetaFinder(Double_t initial_photon_energy);
+  Double_t InteractionFinder(Double_t photon_energy);
+  Double_t ThetaFinder(Double_t photon_energy);
+  Double_t PhiFinder();
+  Double_t ComptonEnergyCalc(Double_t photon_energy,Double_t theta);
   void SetMu(Double_t mu);
-  void SetSplineMu(Double_t initial_photon_energy);
+  void SetSplineMu(Double_t photon_energy);
   Double_t GetMu();
   void SetDetectorLength(Double_t detector_length);
   Double_t GetDetectorLength(); 
-  void SetInitialPhotonEnergy(Double_t initial_photon_energy);
-  Double_t GetInitialPhotonEnergy();
+  void SetPhotonEnergy(Double_t photon_energy);
+  Double_t GetPhotonEnergy();
+  //  void SetPhotonPosition(Double_t photonproperties);
+  //  Double_t GetPhotonPosition();
+  void SetPhotonProperties(Double_t photonproperties);
+  Double_t GetPhotonProperties();
+
   void FileReader();
 };
 

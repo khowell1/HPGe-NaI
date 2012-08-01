@@ -1,4 +1,4 @@
-//beautiful header file for Kaitlin Howell's summer project! man header file
+//beautiful photon header file for Kaitlin Howell's summer project!
 
 #include <math.h>
 #include <stdio.h>

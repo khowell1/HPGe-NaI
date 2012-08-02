@@ -16,15 +16,14 @@ Double_t Photon::InteractionFinder(Double_t photon_energy) {
   Double_t random_num=anything.Rndm();
   Int_t x;
   if (random_num<(pair_mu/total_mu))  {
-    x=1;
+    return(1);
   }
   else if (random_num<((pair_mu+incoherent_mu)/total_mu)) {
-    x=2;
+    return(2);
   }
   else if (random_num<((pair_mu+incoherent_mu+photo_mu)/total_mu)) {
-    x=3;
+    return(3);
   }
-  return (x);
 }
 
 Double_t Photon::ThetaFinder(Double_t photon_energy) {

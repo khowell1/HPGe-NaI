@@ -11,12 +11,13 @@ Setup_Geometry::Geometry() { //default object constructor
   geometrydata[0][1]=cyl_radius;
   geometrydata[0][2]=cyl_height;
 }
-Setup_Geometry::Geometry(Double_t new_cyl_radius,Double_t new_cyl_height,Int_t new_volume_number,Double_t geometrydata[][]) {
+Setup_Geometry::Geometry(Int_t new_volume_number,Double_t new_cyl_radius,Double_t new_cyl_height) {
   //normal object constructor
   cyl_radius=new_cyl_radius;
   cyl_height=new_cyl_height;
   Double_t cylposition[3];
   volume_number=new_volume_number;
+  //should have get and set functions for dealing with the below initializers! Put in another method. deal with later
   geometrydata[new_volume_number][0]=new_volume_number;
   geometrydata[new_volume_number][1]=new_cyl_radius;
   geometrydata[new_volume_number][2]=new_cyl_height;
@@ -49,15 +50,16 @@ void PhotonSphCoordUpdater(Double_t oldsphposition[],Double newsphaddition[],Dou
 
 Double_t ExitGeometryChecker(Double_t finalsphposition[],Double_t exitsphposition,Double_t cyl_radius,Double_t cyl_height) {
   //to change the new array's spherical coordinates to cylinder:
-  cylposition[0]=finalsphposition[0]*sin(finalsphposition[1]*180.0/PI); 
-  cylposition[1]=finalsphposition[1];
-  cylposition[2]=finalsphposition[0]*cos(finalsphposition[1]*180.0/PI);
-  if (cylposition[0]>cyl_radius || newarray_cyl[2]>cyl_height) {
+  //  cylposition[0]=finalsphposition[0]*sin(finalsphposition[1]*180.0/PI); 
+  //  cylposition[1]=finalsphposition[1];
+  //  cylposition[2]=finalsphposition[0]*cos(finalsphposition[1]*180.0/PI);
+  if (finalsphposition[0]*sin(finalsphposition[1]*180.0/PI)>cyl_radius || finalsphposition[0]*cos(finalsphposition[1]*180.0/PI)>cyl_height) {
     exitsphposition[0]=finalsphposition[0]-(finalsphposition[0]-cyl_radius);
     exitsphposition[1]=finalsphposition[1];
     exitsphposition[2]=finalsphposition[2]-(finalsphposition[2]-cyl_radius);
     return true; //need to tell master class that the photon exited!
   }
+  //need to just switch this all to either spherical or cart, prob cart since i can do subtraction and addition in it. the above code doesn't fucking work anyway. can keep using the cyl info for finding boundaries and such, but probably should just stick to two coord systems. 
   return 0;
 }
 

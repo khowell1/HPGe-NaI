@@ -13,6 +13,7 @@ TRandom3 anything; //for getting a random number
 
 
 Photon::Photon() { //constructor for default photon object
+  //make the mu so that it uses the interpolation value now!!!!!
   mu=0.1; //1/cm
   detector_length=10; //cm
   photon_energy=500; //keV
@@ -22,7 +23,7 @@ Photon::Photon() { //constructor for default photon object
 }
 
 Photon::Photon(Double_t new_mu,Double_t new_detector_length, Double_t new_photon_energy) {//constructor for a photon object
-  mu = new_mu;
+  mu = new_mu;//same here!!!! or have another object constructor that you can change mu with?
   detector_length = new_detector_length;
   photon_energy = new_photon_energy;
   photonproperties[0]=photon_energy;

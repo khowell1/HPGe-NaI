@@ -34,7 +34,7 @@
  have length 1)
  
  Alternatively, call GeneratePhoton.  This will return the energy and
- update internal data.  To get the photon direction, us GetPhi, GetTheta 
+ update internal data.  To get the photon direction, use GetPhi, GetTheta 
  or GetDirectionX, GetDirectionY, GetDirectionZ  (the former is 
  spherical Theta and Phi, the latter is the same normalized cartesian
  vector from GetPhoton).  Note that calling GetPhoton will *not* update

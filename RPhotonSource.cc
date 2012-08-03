@@ -156,7 +156,7 @@ Double_t RPhotonSource::GetPhoton() {
     energy = continuous->GetRandom();
   } else {
     //If only a few lines, walk through one-at-a-time (faster)
-    //Probably should implement binary search for larger numbers of lines
+    //Probably should implement binary search for larger numbers of lines (30-40ish)
     //will do later
     for(int i=numLines-1; i >= 0; i--) {
       if(rand < lineProbs[i]) {
@@ -173,7 +173,7 @@ Double_t RPhotonSource::GetPhoton() {
   
 }
 
-Double_t RPhotonSource::GetPhoton(vector<Double_t>& direction) {
+Double_t RPhotonSource::GetPhoton(vector<Double_t>& direction) { //& means pass by reference
   //Returns the generated energy, fills vector direction with a
   //3-vector in cartesian coordinates of the output photon direction
   //with vector length 1
@@ -230,7 +230,7 @@ Double_t RPhotonSource::GetPhoton(Double_t direction[]) {
     TMath::Sin(generatedPhotonPhi);
   direction[2] = TMath::Cos(generatedPhotonTheta);
 
-  return GetPhoton();
+  return GetPhoton(); //still returns energy
 }
 
 Double_t RPhotonSource::GetPhoton(Double_t direction[], Double_t position[]) {

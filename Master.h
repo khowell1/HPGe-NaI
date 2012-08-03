@@ -7,18 +7,14 @@
 #include <iostream>
 #include <fstream>
 #include "TRandom3.h"
-#include "TGraphErrors.h"
-#include "TAxis.h"
-#include "TCanvas.h"
-#include "TH1D.h"
 #include "TSpline.h"
 #include <string>
-#include "RLinearInterpolant.h"
 #include "TF1.h"
+#include "RLinearInterpolant.h"
 #include "RPhotonSource.h"
 #include "Photon.h"
-#include "Setup_Geometry.h"
-#include "RLinearInterpolant.h"
+#include "SetupGeometry.h"
+//#include "makeTTree.cc"
 
 using namespace std;
 
@@ -27,11 +23,23 @@ using namespace std;
 
 class Master
 {
- private: //variables
-
+ private:
 
  public: //methods
-  void Initializer();
+  static Double_t sourceposition[3];
+  static Double_t gecylgeometry[3];
+  static Double_t spacecylgeometry[3];
+  static Double_t naicylgeometry[3];
+  static Double_t initialphotonenergy;
+
+  RPhotonSource *photonsource;
+  Photon *photon;
+  SetupGeometry *geometry;
+
+  Master();
+  ~Master();
+
+  Double_t Initializer();
   void Walk1Photon();
 };
 

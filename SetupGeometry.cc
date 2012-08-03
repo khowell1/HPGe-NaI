@@ -1,62 +1,75 @@
-#include "Setup_Geometry.h"
+#include "SetupGeometry.h"
 
-Double_t Setup_Geometry::PI=3.141592653589793238462;
-Double_t Setup_Geometry::dr=0.1;
+Double_t SetupGeometry::PI=3.141592653589793238462;
+Double_t SetupGeometry::dr=0.1;
 
-Setup_Geometry::SetupGeometry() { //default object constructor
+SetupGeometry::SetupGeometry() { //default object constructor
   //only creates the ge detector geometry in the first array position  
   cyl_radius=4.11; //cm
   cyl_height=6.53; //cm
   volume_number=0;
-  geometrydata[0]={volume_number,cyl_radius,cyl_height};
-  // geometrydata[0][0]=volume_number;
-  // geometrydata[0][1]=cyl_radius;
-  // geometrydata[0][2]=cyl_height;
+  geometrydata[0][0]=volume_number;
+  geometrydata[0][1]=cyl_radius;
+  geometrydata[0][2]=cyl_height;
 }
 
-Setup_Geometry::SetupGeometry(Int_t new_volume_number,Double_t new_cyl_radius,Double_t new_cyl_height) {
+SetupGeometry::SetupGeometry(Int_t new_volume_number,Double_t new_cyl_radius,Double_t new_cyl_height) {
   //normal object constructor
   cyl_radius=new_cyl_radius;
   cyl_height=new_cyl_height;
   volume_number=new_volume_number;
-  geometrydata[new_volume_number]={new_volume_number,new_cyl_radius,new_cyl_height};
-  // geometrydata[new_volume_number][0]=new_volume_number;
-  // geometrydata[new_volume_number][1]=new_cyl_radius;
-  // geometrydata[new_volume_number][2]=new_cyl_height;
+  geometrydata[new_volume_number][0]=new_volume_number;
+  geometrydata[new_volume_number][1]=new_cyl_radius;
+  geometrydata[new_volume_number][2]=new_cyl_height;
 }
 
-void SetVolumeNumber(Int_t new_volume_number) {
+void SetupGeometry::SetVolumeNumber(Int_t new_volume_number) {
   volume_number=new_volume_number;
 }
 
-Int_t GetVolumeNumber() {
+Int_t SetupGeometry::GetVolumeNumber() {
   return volume_number;
 }
 
-void Setup_Geometry::SetGeometryData(Double new_geometrydata[]) {
+void SetupGeometry::SetGeometryData(Double_t new_geometrydata[]) {
   //for changing the geo data for each volume individually
-  geometrydata[new_geometrydata[0]]={new_geometrydata[0],new_geometrydata[1],new_geometrydata[2]};
+  geometrydata[int(new_geometrydata[0])][0]=new_geometrydata[0];
+  geometrydata[int(new_geometrydata[0])][1]=new_geometrydata[1];
+  geometrydata[int(new_geometrydata[0])][2]=new_geometrydata[2];
+  //  geometrydata[new_geometrydata[0]]={new_geometrydata[0],new_geometrydata[1],new_geometrydata[2]};
 }
 
-Double_t Setup_Geometry::GetGeometryData(Int_t volume_number) {
+Double_t SetupGeometry::GetGeometryData(Int_t volume_number) {
   //just prints the geometry data
   cout<<geometrydata[volume_number][0]<<","<<geometrydata[volume_number][1]<<","<<geometrydata[volume_number][2]<<endl;
   return 0;
 }
 
-void Setup_Geometry::SetPhotonPosition(Double new_cartposition[]) {
+void SetupGeometry::SetPhotonPosition(Double_t new_cartposition[]) {
   cartposition[0]=new_cartposition[0];
   cartposition[1]=new_cartposition[1];
   cartposition[2]=new_cartposition[2];
 }
 
-Double_t Setup_Geometry::GetPhotonPosition() {
+Double_t SetupGeometry::GetPhotonPosition() {
   //just prints the position, do I actually need to return a position?
   cout<<cartposition[0]<<","<<cartposition[1]<<","<<cartposition[2]<<endl;
   return 0;
 }
 
-// void Setup_Geometry::PhotonSphCoordChanger(Double_t oldsphposition[],Double_t newsphaddition[]) { //just changing the old spherical array to the new calculated spherical array
+void SetupGeometry::SetNewPhotonAddition(Double_t new_sphaddition[]) {
+  newsphaddition[0]=new_sphaddition[0];
+  newsphaddition[1]=new_sphaddition[1];
+  newsphaddition[2]=new_sphaddition[2];
+}
+
+Double_t SetupGeometry::GetNewPhotonAddition() {
+  //just prints the position, do I actually need to return a position?
+  cout<<newsphaddition[0]<<","<<newsphaddition[1]<<","<<newsphaddition[2]<<endl;
+  return 0;
+}
+
+// void SetupGeometry::PhotonSphCoordChanger(Double_t oldsphposition[],Double_t newsphaddition[]) { //just changing the old spherical array to the new calculated spherical array
 //    oldsphposition[0]=newsphaddition[0];
 //    oldsphposition[1]=newsphaddition[1];
 //    oldsphposition[2]=newsphaddition[2];

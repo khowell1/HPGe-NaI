@@ -7,10 +7,6 @@
 #include <iostream>
 #include <fstream>
 #include "TRandom3.h"
-#include "TGraphErrors.h"
-#include "TAxis.h"
-#include "TCanvas.h"
-#include "TH1D.h"
 #include "TSpline.h"
 #include <string>
 #include "RLinearInterpolant.h"
@@ -47,32 +43,26 @@ class Photon
   RLinearInterpolant *incoherent_spline;
   RLinearInterpolant *photoelec_spline;
   RLinearInterpolant *pairprod_spline;
-
+  
 
  public: //constructors
   Photon();//constructor for default photon object
-
-  Photon(Double_t mu,Double_t detector_length,Double_t photon_energy); //constructor for photon object
+  Photon(Double_t mu,Double_t photon_energy); //constructor for photon object
   ~Photon();
 
  public: //methods
   Double_t PhotonStepperSlick();
-  Double_t InteractionFinder(Double_t photon_energy);
-  Double_t ThetaFinder(Double_t photon_energy);
+  Double_t InteractionFinder();
+  Double_t ThetaFinder();
   Double_t PhiFinder();
-  Double_t ComptonEnergyCalc(Double_t photon_energy,Double_t theta);
-  void SetMu(Double_t mu);
-  void SetSplineMu(Double_t photon_energy);
+  //  void ComptonEnergyCalc();
+  void SetMu(Double_t new_mu);
+  void SetSplineMu();
   Double_t GetMu();
-  void SetDetectorLength(Double_t detector_length);
-  Double_t GetDetectorLength(); 
-  void SetPhotonEnergy(Double_t photon_energy);
+  void SetPhotonEnergy(Double_t new_photon_energy);
   Double_t GetPhotonEnergy();
-  //  void SetPhotonPosition(Double_t photonproperties);
-  //  Double_t GetPhotonPosition();
-  void SetPhotonProperties(Double_t photonproperties);
+  void SetPhotonProperties();
   Double_t GetPhotonProperties();
-
   void FileReader();
 };
 

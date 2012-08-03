@@ -16,7 +16,7 @@ Double_t Photon::InteractionFinder(Double_t photon_energy) {
   Double_t random_num=anything.Rndm();
   Int_t x;
   if (random_num<(pair_mu/total_mu))  {
-    return(1);
+    return(2); //pretend no pair production, just compton and photo! so this is compton for now!
   }
   else if (random_num<((pair_mu+incoherent_mu)/total_mu)) {
     return(2);

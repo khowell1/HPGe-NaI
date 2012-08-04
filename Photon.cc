@@ -43,7 +43,7 @@ void Photon::SetMu(Double_t new_mu) {
   mu=new_mu;
 }
 
-void Photon::SetSplineMu(/*Double_t photon_energy*/) {
+void Photon::SetSplineMu() {
   mu=mu_spline->Eval(photon_energy);
   SetMu(mu);
 }
@@ -95,7 +95,7 @@ void Photon::FileReader() { //eventually need to make it take any file... but st
   Double_t temp_pairelec;
   Double_t temp_cross;
   Double_t temp_cross_nocoh;  
-  int vector_size;
+  //  int vector_size;
 
   ifstream myfile("Ge_cross_notitles.txt");
   while (myfile.good()) { //reading in the values from the file into the vectors
@@ -111,7 +111,7 @@ void Photon::FileReader() { //eventually need to make it take any file... but st
   }    
   myfile.close();
   //redefining the arrays' size
-  vector_size=energy_vector.size();
+  //  vector_size=energy_vector.size();
 
   //splines!!!
   mu_spline= new RLinearInterpolant(energy_vector,cross_vector);
@@ -158,8 +158,11 @@ Double_t Photon::PhiFinder() {   //will choose from 2pi!
   return (phi);   //returns phi in radians
 }
 
-// void Photon::ComptonEnergyCalc(Double_t photon_energy,Double_t theta,Double_t PI,Double_t keV_Jules_convert) {
-//   Double_t new_photon_energy=((photon_energy*MeV_Jules_convert)/(1+(photon_energy*MeV_Jules_convert)/(electron_mass*c*c))(1-cos(theta)));
-// }
+Double_t Photon::ComptonEnergyCalc() {
+  Double_t new_photon_energy=((photon_energy*MeV_Jules_convert)/(1+(photon_energy*MeV_Jules_convert)/(electron_mass*c*c))*(1-cos(theta)));
+  new_photon_energy=new_photon_energy*1/MeV_Jules_convert;
+  cout<<"New Energy from Compton(MeV): "<<new_photon_energy<<endl;
+  return (new_photon_energy);
+}
 
 

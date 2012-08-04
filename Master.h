@@ -31,6 +31,7 @@ class Master
   static Double_t spacecylgeometry[3];
   static Double_t naicylgeometry[3];
   static Double_t initialphotonenergy;
+  Double_t newsphaddition[3];
 
   RPhotonSource *photonsource;
   Photon *photon;
@@ -40,7 +41,11 @@ class Master
   ~Master();
 
   Double_t Initializer();
-  void Walk1Photon();
+  Double_t Walk1Photon();
 };
 
 #endif
+
+
+//I don't think I'm correctly changing the cart coords to cyl so then I always get out of bounds for my photon volume position.
+//Need to test it and see what is actually going on!

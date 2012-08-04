@@ -6,6 +6,7 @@ using namespace std;
 int main() {
   Master master;
   master.Initializer();
+  master.Walk1Photon();
   return 0;
 }
   // Int_t response;

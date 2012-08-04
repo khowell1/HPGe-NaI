@@ -55,7 +55,7 @@ class Photon
   Double_t InteractionFinder();
   Double_t ThetaFinder();
   Double_t PhiFinder();
-  //  void ComptonEnergyCalc();
+  Double_t ComptonEnergyCalc();
   void SetMu(Double_t new_mu);
   void SetSplineMu();
   Double_t GetMu();

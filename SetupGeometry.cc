@@ -53,20 +53,60 @@ void SetupGeometry::SetPhotonPosition(Double_t new_cartposition[]) {
 
 Double_t SetupGeometry::GetPhotonPosition() {
   //just prints the position, do I actually need to return a position?
-  cout<<cartposition[0]<<","<<cartposition[1]<<","<<cartposition[2]<<endl;
+  cout<<"Cart Position: "<<cartposition[0]<<","<<cartposition[1]<<","<<cartposition[2]<<endl;
   return 0;
 }
 
 void SetupGeometry::SetNewPhotonAddition(Double_t new_sphaddition[]) {
   newsphaddition[0]=new_sphaddition[0];
-  newsphaddition[1]=new_sphaddition[1];
-  newsphaddition[2]=new_sphaddition[2];
+  newsphaddition[1]=newsphaddition[1]+new_sphaddition[1];
+  newsphaddition[2]=newsphaddition[2]+new_sphaddition[2];
 }
 
 Double_t SetupGeometry::GetNewPhotonAddition() {
   //just prints the position, do I actually need to return a position?
-  cout<<newsphaddition[0]<<","<<newsphaddition[1]<<","<<newsphaddition[2]<<endl;
+  cout<<"Newsphaddition:"<<newsphaddition[0]<<","<<newsphaddition[1]<<","<<newsphaddition[2]<<endl;
   return 0;
+}
+
+void SetupGeometry::CartPositionUpdater() {
+  cartposition[0]=cartposition[0]+newsphaddition[0]*sin(newsphaddition[1])*cos(newsphaddition[2]);
+  cartposition[1]=cartposition[1]+newsphaddition[1]*sin(newsphaddition[1])*sin(newsphaddition[2]);
+  cartposition[2]=cartposition[2]+newsphaddition[1]*cos(newsphaddition[1]);
+}
+
+void SetupGeometry::SetCylPosition() {
+  cylposition[0]=sqrt(cartposition[0]*cartposition[0]+cartposition[1]*cartposition[1]);
+  if (cartposition[0]==0 && cartposition[1]==0) {
+    cylposition[1]=0;
+  }
+  else if (cartposition[0]>=0) {
+    cylposition[1]=asin(cartposition[1]/cylposition[0]);
+  }
+  else if (cartposition[0]<0) {
+    cylposition[1]=PI-asin(cartposition[1]/cylposition[0]);
+  }
+  cylposition[2]=cartposition[2];
+}
+
+Double_t SetupGeometry::GetCylPosition() {
+  cout<<"cyl position: "<<cylposition[0]<<","<<cylposition[1]<<","<<cylposition[2]<<endl;
+  return 0;
+}
+
+Double_t SetupGeometry::PhotonVolumePosition() {
+  SetCylPosition();
+  for (int n=0;n<3;n++) {
+    if (cylposition[0]<=geometrydata[n][1] && cylposition[2]<=geometrydata[n][2]) {
+      volume_number=n;
+      cout<<"volume number: "<<volume_number<<endl;
+      return (volume_number);
+    }
+    else {
+      cout<<"out of bounds"<<endl;
+      return 0;
+    }
+  }
 }
 
 // void SetupGeometry::PhotonSphCoordChanger(Double_t oldsphposition[],Double_t newsphaddition[]) { //just changing the old spherical array to the new calculated spherical array

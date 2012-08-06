@@ -27,11 +27,14 @@ class Master
 
  public: //methods
   static Double_t sourceposition[3];
+  static Double_t topspacecylgeometry[3];
   static Double_t gecylgeometry[3];
   static Double_t spacecylgeometry[3];
   static Double_t naicylgeometry[3];
   static Double_t initialphotonenergy;
   Double_t newsphaddition[3];
+  Double_t *cartposition[3];
+  Double_t photoninfo[5];
 
   RPhotonSource *photonsource;
   Photon *photon;

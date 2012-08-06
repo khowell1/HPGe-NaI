@@ -57,10 +57,16 @@ Double_t SetupGeometry::GetPhotonPosition() {
   return 0;
 }
 
+// Double_t *GetCartPosition() {
+//   return cartposition;
+// }
+
 void SetupGeometry::SetNewPhotonAddition(Double_t new_sphaddition[]) {
   newsphaddition[0]=new_sphaddition[0];
   newsphaddition[1]=newsphaddition[1]+new_sphaddition[1];
   newsphaddition[2]=newsphaddition[2]+new_sphaddition[2];
+  CartPositionUpdater();
+  SetCylPosition();
 }
 
 Double_t SetupGeometry::GetNewPhotonAddition() {
@@ -81,12 +87,12 @@ void SetupGeometry::SetCylPosition() {
     cylposition[1]=0;
   }
   else if (cartposition[0]>=0) {
-    cylposition[1]=asin(cartposition[1]/cylposition[0]);
+    cylposition[1]=asin(cartposition[1]/cylposition[0]);//sin-1(y/rho)
   }
   else if (cartposition[0]<0) {
-    cylposition[1]=PI-asin(cartposition[1]/cylposition[0]);
+    cylposition[1]=PI-asin(cartposition[1]/cylposition[0]); //pi-sin(y/rho)
   }
-  cylposition[2]=cartposition[2];
+  cylposition[2]=cartposition[2];//same in both systems, height
 }
 
 Double_t SetupGeometry::GetCylPosition() {
@@ -94,17 +100,19 @@ Double_t SetupGeometry::GetCylPosition() {
   return 0;
 }
 
-Double_t SetupGeometry::PhotonVolumePosition() {
+void SetupGeometry::PhotonVolumePosition() {
   SetCylPosition();
-  for (int n=0;n<3;n++) {
+  for (int n=0;n<=3;n++) {
+    if (cylposition[2]<0) {
+      cout<<"negative z"<<endl;
+      SetVolumeNumber(5);
+    }
     if (cylposition[0]<=geometrydata[n][1] && cylposition[2]<=geometrydata[n][2]) {
-      volume_number=n;
-      cout<<"volume number: "<<volume_number<<endl;
-      return (volume_number);
+      SetVolumeNumber(n);
     }
     else {
       cout<<"out of bounds"<<endl;
-      return 0;
+      SetVolumeNumber(5);
     }
   }
 }

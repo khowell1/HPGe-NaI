@@ -2,9 +2,10 @@
 #include "Master.h"
 
 Double_t Master::sourceposition[3]={0.0,0.0,10.0};
-Double_t Master::gecylgeometry[3]={0,4.11,6.53};
-Double_t Master::spacecylgeometry[3]={1,4.20,6.53};
-Double_t Master::naicylgeometry[3]={2,5.00,6.53};
+Double_t Master::topspacecylgeometry[3]={0,5.00,10.0};
+Double_t Master::gecylgeometry[3]={1,4.11,6.53};
+Double_t Master::spacecylgeometry[3]={2,4.20,6.53};
+Double_t Master::naicylgeometry[3]={3,5.00,6.53};
 Double_t Master::initialphotonenergy=500; //keV but switched to MeV in initializer
 
 Master::Master() {
@@ -31,6 +32,7 @@ Double_t Master::Initializer() { //gets a photon too... probably should do this 
   //deal with photon initializing
   photon->FileReader();
   //deal with geometry initializing
+  geometry->SetGeometryData(topspacecylgeometry);
   geometry->SetGeometryData(gecylgeometry);
   geometry->SetGeometryData(spacecylgeometry);
   geometry->SetGeometryData(naicylgeometry);
@@ -47,26 +49,32 @@ Double_t Master::Walk1Photon() {
     //need to fill that position array to give to geometry!
     newsphaddition[0]=photon->PhotonStepperSlick();
     geometry->SetNewPhotonAddition(newsphaddition);
-
+    geometry->PhotonVolumePosition();
     Int_t typeinteraction=photon->InteractionFinder(); //find which interaction
+    if (geometry->GetVolumeNumber()==5) {
+      cout<<"out of bounds"<<endl;
+      return (false);
+    }
     // if (typeinteraction==1) {
     //   //pair production... figure out what to do later!
     // }
-    if (typeinteraction==2) {
+    else if (typeinteraction==2) {
       //compton scattering!
       newsphaddition[1]=photon->ThetaFinder(); //differential cross section theta!
       newsphaddition[2]=photon->PhiFinder();
       cout<<"Compton Interaction"<<endl;
       photon->SetPhotonEnergy(photon->ComptonEnergyCalc());
-      if (photon->GetPhotonEnergy()<=0) {
-	return (false);
-      }
-      geometry->SetNewPhotonAddition(newsphaddition);
-      geometry->CartPositionUpdater();
       geometry->GetPhotonPosition();//cart coords
-      geometry->PhotonVolumePosition();
       geometry->GetCylPosition();
-      return (false);//for now...
+      geometry->PhotonVolumePosition();
+      if (photon->GetPhotonEnergy()<=0) {
+	cout<<"compton energy less than 0"<<endl;
+	break;
+      }
+      else if (geometry->GetVolumeNumber()==5) {
+	cout<<"out of bounds" <<endl;
+	break;
+      }
     }
     else if (typeinteraction==3) {
       //photo

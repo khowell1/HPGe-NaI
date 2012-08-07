@@ -14,6 +14,9 @@
 #include "RPhotonSource.h"
 #include "Photon.h"
 #include "SetupGeometry.h"
+#include <string>
+#include "TTree.h"
+#include "TFile.h"
 //#include "makeTTree.cc"
 
 using namespace std;
@@ -24,8 +27,15 @@ using namespace std;
 class Master
 {
  private:
-
- public: //methods
+  Int_t photonnumber;
+  Double_t energy;
+  Double_t xposition;
+  Double_t yposition;
+  Double_t zposition;
+  Double_t cartposition[3];
+  Int_t volumenumber;
+  Int_t interactiontype;//0 is nothing,1 is compton,2 is scattering
+  Int_t loopnumber;
   static Double_t sourceposition[3];
   static Double_t topspacecylgeometry[3];
   static Double_t gecylgeometry[3];
@@ -33,22 +43,20 @@ class Master
   static Double_t naicylgeometry[3];
   static Double_t initialphotonenergy;
   Double_t newsphaddition[3];
-  Double_t *cartposition[3];
-  Double_t photoninfo[5];
 
+ public: //methods
   RPhotonSource *photonsource;
   Photon *photon;
   SetupGeometry *geometry;
+  TFile *myfile;
+  TTree *outTree;
 
   Master();
   ~Master();
 
   Double_t Initializer();
   Double_t Walk1Photon();
+  void Finisher();
 };
 
 #endif
-
-
-//I don't think I'm correctly changing the cart coords to cyl so then I always get out of bounds for my photon volume position.
-//Need to test it and see what is actually going on!

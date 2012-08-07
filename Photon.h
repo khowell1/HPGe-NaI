@@ -48,22 +48,20 @@ class Photon
  public: //constructors
   Photon();//constructor for default photon object
   Photon(Double_t mu,Double_t photon_energy); //constructor for photon object
-  ~Photon();
+  ~Photon();//deconstructor
 
  public: //methods
-  Double_t PhotonStepperSlick();
-  Double_t InteractionFinder();
-  Double_t ThetaFinder();
-  Double_t PhiFinder();
-  Double_t ComptonEnergyCalc();
-  void SetMu(Double_t new_mu);
-  void SetSplineMu();
-  Double_t GetMu();
-  void SetPhotonEnergy(Double_t new_photon_energy);
-  Double_t GetPhotonEnergy();
-  void SetPhotonProperties();
-  Double_t GetPhotonProperties();
-  void FileReader();
+  void SetMu(Double_t new_mu);//saves a new given mu
+  void SetSplineMu();//calcs spline mu from currently saved energy, calls setmu
+  Double_t GetMu(); //returns currently saved mu
+  void SetPhotonEnergy(Double_t new_photon_energy); //saves a new given photon energy
+  Double_t GetPhotonEnergy();//returns currently saved photon energy
+  void FileReader(); //reads a attenuation coefficient file (mu's) and makes splines
+  Double_t PhotonStepperSlick();//returns a random photon walk length
+  Double_t InteractionFinder(); //returns either 1 for compton or 2 for photoelectric
+  Double_t ThetaFinder(); //returns a random differential cross section theta
+  Double_t PhiFinder(); //returns a random phi from 0->2PI
+  Double_t ComptonEnergyCalc();//returns a compton scattering calced photon energy
 };
 
 #endif

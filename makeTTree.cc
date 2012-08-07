@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
   //  /D is Double_t, you can look the others up in the TTree documentation
   outTree->Branch("exp", &expo, "exp/D");
   outTree->Branch("gaus", &gaussian, "gaus/D");
-  outTree->Branch("flat", &flat, "flat/D");
+  outTree->Branch("flat", flat, "flat[3]/D");
   outTree->Branch("eventNum",&event,"eventNum/I");
   
   for(event = 0; event < 10000; event++) {

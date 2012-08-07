@@ -30,7 +30,7 @@ Photon::Photon(Double_t new_mu,Double_t new_photon_energy) {//constructor for a 
   gRandom->SetSeed(0);
 }
 
-Photon::~Photon() {
+Photon::~Photon() { //deconstructor
   delete mu_spline;
   delete coherent_spline;
   delete incoherent_spline;
@@ -39,43 +39,27 @@ Photon::~Photon() {
   delete thetafinder;
 }
 
-void Photon::SetMu(Double_t new_mu) {
+void Photon::SetMu(Double_t new_mu) { //sets mu
   mu=new_mu;
 }
 
-void Photon::SetSplineMu() {
+void Photon::SetSplineMu() { //finds energy_dependent mu from spline, calls spline mu
   mu=mu_spline->Eval(photon_energy);
   SetMu(mu);
 }
 
-Double_t Photon::GetMu() {
+Double_t Photon::GetMu() { //prints and returns mu
   cout<<mu<<endl;
   return (mu);
 }
 
-void Photon::SetPhotonEnergy(Double_t new_photon_energy) {
+void Photon::SetPhotonEnergy(Double_t new_photon_energy) { //sets photon energy
   photon_energy= new_photon_energy;
 }
 
-Double_t Photon::GetPhotonEnergy() {
-  cout<<photon_energy<<endl;
+Double_t Photon::GetPhotonEnergy() { //prints and returns photon energy
+  //  cout<<photon_energy<<endl;
   return (photon_energy);
-}
-
-void Photon::SetPhotonProperties() {
-  //[photon energy,distance,theta,phi]
-  photonproperties[0]=photon_energy;
-  photonproperties[1]=PhotonStepperSlick();
-  photonproperties[2]=ThetaFinder(); //or just use new theta? later when geometry is set up
-  photonproperties[3]=PhiFinder();
-}
-
-Double_t Photon::GetPhotonProperties() {
-  cout<<"Photon Energy(MeV): "<<photonproperties[0]<<endl;
-  cout<<"Photon Distance(cm): "<<photonproperties[1]<<endl;
-  cout<<"Theta(rad): "<<photonproperties[2]<<endl;
-  cout<<"Phi(rad): "<<photonproperties[3]<<endl;
-  return 0;
 }
 
 void Photon::FileReader() { //eventually need to make it take any file... but static for now!
@@ -127,25 +111,23 @@ Double_t Photon::PhotonStepperSlick() { //slick photon depth method, simply give
 }
 
 Double_t Photon::InteractionFinder() {
+//uses spline mu's to calc probabilities and then randomly return a type of interaction
   Double_t photo_mu=photoelec_spline->Eval(photon_energy);
   //  Double_t coherent_mu=coherent_spline->Eval(photon_energy);
   Double_t incoherent_mu=incoherent_spline->Eval(photon_energy);
   Double_t pair_mu=pairprod_spline->Eval(photon_energy);
-  Double_t total_mu=photo_mu+incoherent_mu+pair_mu;
+  Double_t total_mu=photo_mu+incoherent_mu;
   Double_t random_num=anything.Rndm();
-  if (random_num<(pair_mu/total_mu))  {
-    return(2); //pretend no pair production, just compton and photo! so this is compton for now!
+  if (random_num<((incoherent_mu)/total_mu)) {
+    return(1);
   }
-  else if (random_num<((pair_mu+incoherent_mu)/total_mu)) {
+  else if (random_num<((incoherent_mu+photo_mu)/total_mu)) {
     return(2);
-  }
-  else if (random_num<((pair_mu+incoherent_mu+photo_mu)/total_mu)) {
-    return(3);
   }
   return 0;
 }
 
-Double_t Photon::ThetaFinder() {
+Double_t Photon::ThetaFinder() {//finds differential random theta
   TF1 *thetafinder= new TF1("theta","((1/(1+([0]/511)*(1-x)))^2)*((1/(1+([0]/511)*(1-x)))+(1+([0]/511)*(1-x))-(1-x^2))",-1,1);
   thetafinder->SetParameter(0,photon_energy);
   theta=acos(thetafinder->GetRandom()); //could just make this one line...
@@ -158,10 +140,9 @@ Double_t Photon::PhiFinder() {   //will choose from 2pi!
   return (phi);   //returns phi in radians
 }
 
-Double_t Photon::ComptonEnergyCalc() {
+Double_t Photon::ComptonEnergyCalc() {//calcs new compton scattering energy
   Double_t new_photon_energy=((photon_energy*MeV_Jules_convert)/(1+(photon_energy*MeV_Jules_convert)/(electron_mass*c*c))*(1-cos(theta)));
   new_photon_energy=new_photon_energy*1/MeV_Jules_convert;
-  cout<<"New Energy from Compton(MeV): "<<new_photon_energy<<endl;
   return (new_photon_energy);
 }
 

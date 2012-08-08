@@ -13,7 +13,9 @@ RPhotonSource::RPhotonSource() {
     positionArr[i] = 0;
     directionArr[i] = 0;
     sourceCenterPosition[i] = 0;
+    fixedDirection[i] = 0;
   }
+  directionType = 'i';
   setupOK = false;
 }
 
@@ -88,7 +90,9 @@ void RPhotonSource::ClearPhotons() {
     positionArr[i] = 0;
     directionArr[i] = 0;
     sourceCenterPosition[i] = 0;
+    fixedDirection[i] = 0;
   }
+  directionType = 'i';
   setupOK = false;
 }
 

@@ -24,6 +24,11 @@
  AddContinuous(myTF1, 2)
  after calling AddLine as above
 
+ The default is an isotropic source.  Currently, you can set a fixed
+ output direction by calling SetFixedDirection, and revert back to
+ isotropic by calling SetIsotropic.  Later upgrades will include 
+ generating photons in a cone (i.e. in a range of theta's).
+
  You must call Initialize() before generating photons (this converts
  relProb to actual probabilities)
 
@@ -43,7 +48,6 @@
 **********************************************************************/
 
 #include <vector>
-#include <string>
 #include "TROOT.h"
 #include "TF1.h"
 #include "TRandom3.h"
@@ -70,6 +74,8 @@ class RPhotonSource {
   Double_t sourceCenterPosition[3];
   Double_t generatedPhotonTheta;
   Double_t generatedPhotonPhi;
+  Double_t fixedDirection[3];
+  Char_t directionType; //i for iso, f for fixed
   
  public:
   RPhotonSource();
@@ -89,6 +95,9 @@ class RPhotonSource {
   void GetSourcePosition(vector<Double_t> position);
   void GetSourcePosition(Double_t position[]);
   vector<Double_t> GetSourcePosition();
+  void SetFixedDirection(vector<Double_t> direction);
+  void SetFixedDirection(Double_t direction[]);
+  void SetIsotropic();
   Double_t GeneratePhoton();
   Double_t GetEnergy() {return generatedPhotonEnergy;}
   Double_t GetPhi() {return generatedPhotonPhi;}

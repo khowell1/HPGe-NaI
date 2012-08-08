@@ -178,20 +178,31 @@ Double_t RPhotonSource::GetPhoton(vector<Double_t>& direction) { //& means pass 
   //3-vector in cartesian coordinates of the output photon direction
   //with vector length 1
   
-  //Convert from uniform in Cos(theta), this gives correct distribution
-  generatedPhotonTheta = TMath::ACos(gRandom->Uniform(-1,1));
-  generatedPhotonPhi = gRandom->Rndm()*2*TMath::Pi();
-  
   if(direction.size() < 3) {
     direction.resize(3);
   }
 
-  //Set in order x,y,z
-  direction[0] = TMath::Sin(generatedPhotonTheta)*
-    TMath::Cos(generatedPhotonPhi);
-  direction[1] = TMath::Sin(generatedPhotonTheta)*
-    TMath::Sin(generatedPhotonPhi);
-  direction[2] = TMath::Cos(generatedPhotonTheta);
+  if(directionType == 'f') {
+    direction[0] = fixedDirection[0];
+    direction[1] = fixedDirection[1];
+    direction[2] = fixedDirection[2];
+  } else if(directionType == 'i') {
+    //Convert from uniform in Cos(theta), this gives correct distribution
+    generatedPhotonTheta = TMath::ACos(gRandom->Uniform(-1,1));
+    generatedPhotonPhi = gRandom->Rndm()*2*TMath::Pi();
+    
+    //Set in order x,y,z
+    direction[0] = TMath::Sin(generatedPhotonTheta)*
+      TMath::Cos(generatedPhotonPhi);
+    direction[1] = TMath::Sin(generatedPhotonTheta)*
+      TMath::Sin(generatedPhotonPhi);
+    direction[2] = TMath::Cos(generatedPhotonTheta);
+  } else {
+    //Somehow direction type not set correctly, set direction to gibberish
+    direction[0] = 0;
+    direction[1] = 0;
+    direction[2] = 0;
+  }    
 
   return GetPhoton();
 
@@ -219,18 +230,32 @@ Double_t RPhotonSource::GetPhoton(Double_t direction[]) {
   //Same as above, but outputs to first three elements of input array
   //This is dangerous!  Must have long enough array!
 
-  //Convert from uniform in Cos(theta), this gives correct distribution
-  generatedPhotonTheta = TMath::ACos(gRandom->Uniform(-1,1));
-  generatedPhotonPhi = gRandom->Rndm()*2*TMath::Pi();
-  
-  //Set in order x,y,z
-  direction[0] = TMath::Sin(generatedPhotonTheta)*
-    TMath::Cos(generatedPhotonPhi);
-  direction[1] = TMath::Sin(generatedPhotonTheta)*
-    TMath::Sin(generatedPhotonPhi);
-  direction[2] = TMath::Cos(generatedPhotonTheta);
+  if(directionType == 'f') {
+    direction[0] = fixedDirection[0];
+    direction[1] = fixedDirection[1];
+    direction[2] = fixedDirection[2];
+  } else if(directionType == 'i') {
+    //Convert from uniform in Cos(theta), this gives correct distribution
+    generatedPhotonTheta = TMath::ACos(gRandom->Uniform(-1,1));
+    generatedPhotonPhi = gRandom->Rndm()*2*TMath::Pi();
+    
+    //Set in order x,y,z
+    direction[0] = TMath::Sin(generatedPhotonTheta)*
+      TMath::Cos(generatedPhotonPhi);
+    direction[1] = TMath::Sin(generatedPhotonTheta)*
+      TMath::Sin(generatedPhotonPhi);
+    direction[2] = TMath::Cos(generatedPhotonTheta);
+    
+  } else {
+    //Somehow direction type not set correctly, set direction to gibberish
+    direction[0] = 0;
+    direction[1] = 0;
+    direction[2] = 0;
+  }
 
   return GetPhoton(); //still returns energy
+
+
 }
 
 Double_t RPhotonSource::GetPhoton(Double_t direction[], Double_t position[]) {
@@ -312,6 +337,62 @@ vector<Double_t> RPhotonSource::GetSourcePosition() {
   
   return position;
 
+}
+
+void RPhotonSource::SetFixedDirection(vector<Double_t> direction) {
+  //Sets source to output in a fixed direction, with direction
+  //given by input vector.
+  //The input vector will be normalized.  If it is too small or has
+  //length zero (or nearly zero) this command will do nothing
+  
+  if(direction.size() < 3)
+    return;
+
+  Double_t length = 0;
+  for(int i=0; i < 3; i++)
+    length += direction[i]*direction[i];
+  
+  //Ignore tiny lengths, these are probably zero vectors
+  if(length < 1e-12)
+    return;
+  
+  //Ok, good to go, set it up
+  directionType = 'f';
+  for(int i=0; i < 3; i++)
+    fixedDirection[i] = direction[i]/length;
+  //Compute Theta, Phi
+  generatedPhotonTheta = TMath::ACos(fixedDirection[2]);
+  generatedPhotonPhi = TMath::ATan2(fixedDirection[0],fixedDirection[1]);
+
+}
+
+void RPhotonSource::SetFixedDirection(Double_t direction[3]) {
+  //Sets source to output in a fixed direction, with direction given
+  //by input array.  Note: dangerous!  Must be at least length 3!  
+  //The input vector will be normalized.  If it has length zero (or
+  //nearly zero) this command will do nothing
+  
+  Double_t length = 0;
+  for(int i=0; i < 3; i++)
+    length += direction[i]*direction[i];
+  
+  //Ignore tiny lengths, these are probably zero vectors
+  if(length < 1e-12)
+    return;
+  
+  //Ok, good to go, set it up
+  directionType = 'f';
+  for(int i=0; i < 3; i++)
+    fixedDirection[i] = direction[i]/length;
+  //Compute Theta, Phi
+  generatedPhotonTheta = TMath::ACos(fixedDirection[2]);
+  generatedPhotonPhi = TMath::ATan2(fixedDirection[0],fixedDirection[1]);
+
+}
+
+void RPhotonSource::SetIsotropic() {
+  //Switches to isotropic source
+  directionType = 'i';
 }
 
 void RPhotonSource::Print() {

@@ -38,15 +38,17 @@ class SetupGeometry
   Int_t GetVolumeNumber();
   void SetGeometryData(Double_t new_geometrydata[]);
   Double_t GetGeometryData();
-  //  void SetPhotonPosition(Double_t new_cartposition[]);//sets cart position to given coords
-  Double_t GetPhotonPosition(); //prints current cart coords
   void SetPhotonPosition(Double_t currentcartposition[]); //fills an array with cart coords
   void SetNewSphAddition(Double_t new_sphaddition[]);
-  Double_t GetNewSphAddition();
   void SetCartPosition(); //adds the new spherical info to current cart coords
   void PhotonVolumePosition();
   void PhotonExitCartPosition(Int_t old_volume_number);
   bool GetNewVolumeReached();
+  void SetOriginalPosition(Double_t sourceposition[]);
 };
 
 #endif
+
+  //  Double_t GetNewSphAddition();
+  //  Double_t GetPhotonPosition(); //prints current cart coords
+  //  void SetPhotonPosition(Double_t new_cartposition[]);//sets cart position to given coords

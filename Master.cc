@@ -22,7 +22,6 @@ Master::~Master() {
   delete photon;
   delete geometry;
   delete myfile;
-  delete outTree;
 }
 
 Double_t Master::Initializer() {
@@ -33,9 +32,6 @@ Double_t Master::Initializer() {
   photonsource->SetSourcePosition(sourceposition);
   photonsource->AddLine(initialphotonenergy);
   photonsource->Initialize();
-
-  //deal with photon initializing
-  photon->FileReader();//reads Ge mu attenuation coefficient file
 
   //deal with geometry initializing
   geometry->SetGeometryData(topspacecylgeometry);//n=0
@@ -54,26 +50,32 @@ Double_t Master::Initializer() {
   //initial conditions for the first photon!
   photonnumber=0;
   volumenumber=0;
+  loopnumber=0;
+
+  photon->FileReader();//reads Ge mu attenuation coefficient file
 
   return 0;
 }
 
 Double_t Master::Walk1Photon() {
+
   photon->SetPhotonEnergy(photonsource->GetPhoton()); //value is from photon source, in MeV
   energy=photon->GetPhotonEnergy(); //for ttree branch
-  geometry->SetPhotonPosition(sourceposition);//of course starting at source :)
+  geometry->SetOriginalPosition(sourceposition);//of course starting at source :)
   geometry->SetPhotonPosition(cartposition);//puts cart coords in currentcartposition array
-  photon->SetSplineMu(); //finding spline mu for found photon energy
-  newsphaddition[1]=0; //original theta
+  photon->SetSplineMu(volumenumber); //finding spline mu for found photon energy
+  newsphaddition[1]=3.1415; //original theta
   newsphaddition[2]=0; //original phi
   bool loopcontinue=true; //lets me know whether the loop will continue!
-  loopnumber=0;
+  interactiontype=0;
+  outTree->Fill();
 
   while (loopcontinue) {//will loop until all energy deposited or escape!
     
     newsphaddition[0]=photon->PhotonStepperSlick(); //find photon walk length
     geometry->SetNewSphAddition(newsphaddition); //find new photon cart position
     geometry->SetPhotonPosition(cartposition);//sets master class cartposition to geo class one
+    cout<<cartposition[0]<<","<<cartposition[1]<<","<<cartposition[2]<<endl;
     geometry->PhotonVolumePosition(); //finds which volume the photon is in, if the photon reaches a new volume it will call exitcartposition to find the new cart position at the boundary.
     
     volumenumber=geometry->GetVolumeNumber();//just set volumenumber to geo class's vol number
@@ -81,7 +83,7 @@ Double_t Master::Walk1Photon() {
     interactiontype=photon->InteractionFinder(); //finds which interaction occured
 
     if (geometry->GetVolumeNumber()==5) { //checking photon is within total volume bounds
-      //cout<<"out of bounds"<<endl;
+      cout<<"out of bounds"<<endl;
       loopcontinue=false;
     }
     else if (geometry->GetVolumeNumber()==6) {
@@ -89,35 +91,38 @@ Double_t Master::Walk1Photon() {
       loopcontinue=false;
     }
     else if (geometry->GetNewVolumeReached()==true) { //checking if new volume reached
-      //cout<<"photon crossed a boundary!"<<endl;
-      geometry->GetPhotonPosition();
+      photon->SetSplineMu(volumenumber);
+      cout<<"photon crossed a boundary!"<<endl;
+      //  geometry->SetCartPosition();
     }
     else if (interactiontype==1) { //compton scattering!
+      cout<<"compton"<<endl;
       newsphaddition[1]=photon->ThetaFinder(); //differential cross section theta!
       newsphaddition[2]=photon->PhiFinder(); //new random phi direction
 
       photon->SetPhotonEnergy(photon->ComptonEnergyCalc());//new photon energy is from compton
 
       if (photon->GetPhotonEnergy()<=0) {//checking that new photon energy is larger than 0
+	cout<<"compton absorbed"<<endl;
 	energy=0.0; //so photon has been fully absorbed!
 	loopcontinue=false;//tells while loop to end
       }
       outTree->Fill();
     }
     else if (interactiontype==2) { //photoelectric effect!
+      cout<<"photo"<<endl;
       energy=0.0;
       outTree->Fill();
       loopcontinue=false; //tells while loop to end
     }
     loopnumber++; //increases the loop number by one for every time the while loops...
   }
-  photonnumber++; //increases the photon number for everytime a photon finishes doing its stuff
+  photonnumber++;//increases the photon number for everytime a photon finishes doing its stuff
+  cout<<"total photon loop complete"<<endl;
   return 0;
 }
 
 void Master::Finisher() {
   outTree->Write();
   myfile->Close();
-  TFile f("kaitlin_results.root");
-  T->Show(1);
 }

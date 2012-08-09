@@ -11,6 +11,7 @@
 #include <string>
 #include "RLinearInterpolant.h"
 #include "TF1.h"
+#include <string>
 
 using namespace std;
 
@@ -28,6 +29,7 @@ class Photon
   static Double_t c;
   static Double_t electron_mass;
   static Double_t MeV_Jules_convert;
+  static Double_t densityarray[4];
   //variables that are determined from main 
   Double_t photon_energy;
   Double_t mu;
@@ -43,6 +45,8 @@ class Photon
   RLinearInterpolant *incoherent_spline;
   RLinearInterpolant *photoelec_spline;
   RLinearInterpolant *pairprod_spline;
+
+  //  string muattentuationfile;
   
 
  public: //constructors
@@ -52,7 +56,7 @@ class Photon
 
  public: //methods
   void SetMu(Double_t new_mu);//saves a new given mu
-  void SetSplineMu();//calcs spline mu from currently saved energy, calls setmu
+  void SetSplineMu(Int_t volumenumber);//calcs spline mu w/ currently saved energy, calls setmu
   Double_t GetMu(); //returns currently saved mu
   void SetPhotonEnergy(Double_t new_photon_energy); //saves a new given photon energy
   Double_t GetPhotonEnergy();//returns currently saved photon energy

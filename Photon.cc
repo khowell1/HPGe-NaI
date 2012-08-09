@@ -9,6 +9,8 @@ Double_t Photon::PI=3.141592653589793238462;
 Double_t Photon::c=2.9979245800e8; //m/s
 Double_t Photon::electron_mass=9.10938188e-31; //kg
 Double_t Photon::MeV_Jules_convert=1.602e-13; //J
+Double_t Photon::densityarray[4]={10e-16,5.323,10e-16,3.67}; //g/cm^3,vacuum,ge,space,nai
+
 TRandom3 anything; //for getting a random number
 
 
@@ -43,8 +45,8 @@ void Photon::SetMu(Double_t new_mu) { //sets mu
   mu=new_mu;
 }
 
-void Photon::SetSplineMu() { //finds energy_dependent mu from spline, calls spline mu
-  mu=mu_spline->Eval(photon_energy);
+void Photon::SetSplineMu(Int_t volumenumber) { //finds energy_dependent mu from spline, calls spline mu
+  mu=densityarray[volumenumber]*mu_spline->Eval(photon_energy);
   SetMu(mu);
 }
 
@@ -62,49 +64,6 @@ Double_t Photon::GetPhotonEnergy() { //prints and returns photon energy
   return (photon_energy);
 }
 
-void Photon::FileReader() { //eventually need to make it take any file... but static for now!
-  vector<Double_t> energy_vector;
-  vector<Double_t> coherent_scat_vector;
-  vector<Double_t> incoherent_scat_vector;
-  vector<Double_t> photoelectric_vector;
-  vector<Double_t> pairprodnucl_vector;
-  vector<Double_t> pairprodelec_vector;
-  vector<Double_t> cross_vector;
-  vector<Double_t> cross_nocoher_vector;
-  Double_t temp_energy;
-  Double_t temp_coherent;
-  Double_t temp_incoherent;
-  Double_t temp_photo;
-  Double_t temp_pairnucl;
-  Double_t temp_pairelec;
-  Double_t temp_cross;
-  Double_t temp_cross_nocoh;  
-  //  int vector_size;
-
-  ifstream myfile("Ge_cross_notitles.txt");
-  while (myfile.good()) { //reading in the values from the file into the vectors
-    myfile>>temp_energy>>temp_coherent>>temp_incoherent>>temp_photo>>temp_pairnucl>>temp_pairelec>>temp_cross>>temp_cross_nocoh;
-    energy_vector.push_back(temp_energy);
-    coherent_scat_vector.push_back(temp_coherent);
-    incoherent_scat_vector.push_back(temp_incoherent);
-    photoelectric_vector.push_back(temp_photo);
-    pairprodnucl_vector.push_back(temp_pairnucl);
-    pairprodelec_vector.push_back(temp_pairelec);
-    cross_vector.push_back(temp_cross);
-    cross_nocoher_vector.push_back(temp_cross_nocoh);
-  }    
-  myfile.close();
-  //redefining the arrays' size
-  //  vector_size=energy_vector.size();
-
-  //splines!!!
-  mu_spline= new RLinearInterpolant(energy_vector,cross_vector);
-  //  coherent_spline= new RLinearInterpolant(energy_vector,coherent_scat_vector);
-  incoherent_spline= new RLinearInterpolant(energy_vector,incoherent_scat_vector);
-  photoelec_spline= new RLinearInterpolant(energy_vector,photoelectric_vector);
-  pairprod_spline= new RLinearInterpolant(energy_vector,pairprodnucl_vector);
-}
-
 Double_t Photon::PhotonStepperSlick() { //slick photon depth method, simply gives path length
   Double_t random_number=anything.Rndm(); 
   return ((-1/mu)*log(1-random_number)); 
@@ -115,7 +74,7 @@ Double_t Photon::InteractionFinder() {
   Double_t photo_mu=photoelec_spline->Eval(photon_energy);
   //  Double_t coherent_mu=coherent_spline->Eval(photon_energy);
   Double_t incoherent_mu=incoherent_spline->Eval(photon_energy);
-  Double_t pair_mu=pairprod_spline->Eval(photon_energy);
+  //  Double_t pair_mu=pairprod_spline->Eval(photon_energy);
   Double_t total_mu=photo_mu+incoherent_mu;
   Double_t random_num=anything.Rndm();
   if (random_num<((incoherent_mu)/total_mu)) {
@@ -144,6 +103,48 @@ Double_t Photon::ComptonEnergyCalc() {//calcs new compton scattering energy
   Double_t new_photon_energy=((photon_energy*MeV_Jules_convert)/(1+(photon_energy*MeV_Jules_convert)/(electron_mass*c*c))*(1-cos(theta)));
   new_photon_energy=new_photon_energy*1/MeV_Jules_convert;
   return (new_photon_energy);
+}
+
+
+void Photon::FileReader() { 
+  vector<Double_t> energy_vector;
+  vector<Double_t> coherent_scat_vector;
+  vector<Double_t> incoherent_scat_vector;
+  vector<Double_t> photoelectric_vector;
+  vector<Double_t> pairprodnucl_vector;
+  vector<Double_t> pairprodelec_vector;
+  vector<Double_t> cross_vector;
+  vector<Double_t> cross_nocoher_vector;
+  Double_t temp_energy;
+  Double_t temp_coherent;
+  Double_t temp_incoherent;
+  Double_t temp_photo;
+  Double_t temp_pairnucl;
+  Double_t temp_pairelec;
+  Double_t temp_cross;
+  Double_t temp_cross_nocoh;  
+
+
+  ifstream myfile("Ge_cross_notitles.txt");
+  while (myfile.good()) { //reading in the values from the file into the vectors
+    myfile>>temp_energy>>temp_coherent>>temp_incoherent>>temp_photo>>temp_pairnucl>>temp_pairelec>>temp_cross>>temp_cross_nocoh;
+    energy_vector.push_back(temp_energy);
+    coherent_scat_vector.push_back(temp_coherent);
+    incoherent_scat_vector.push_back(temp_incoherent);
+    photoelectric_vector.push_back(temp_photo);
+    pairprodnucl_vector.push_back(temp_pairnucl);
+    pairprodelec_vector.push_back(temp_pairelec);
+    cross_vector.push_back(temp_cross);
+    cross_nocoher_vector.push_back(temp_cross_nocoh);
+  }    
+  myfile.close();
+
+  //splines!!!
+  mu_spline= new RLinearInterpolant(energy_vector,cross_vector);
+  //  coherent_spline= new RLinearInterpolant(energy_vector,coherent_scat_vector);
+  incoherent_spline= new RLinearInterpolant(energy_vector,incoherent_scat_vector);
+  photoelec_spline= new RLinearInterpolant(energy_vector,photoelectric_vector);
+  pairprod_spline= new RLinearInterpolant(energy_vector,pairprodnucl_vector);
 }
 
 

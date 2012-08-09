@@ -17,7 +17,6 @@
 #include <string>
 #include "TTree.h"
 #include "TFile.h"
-//#include "makeTTree.cc"
 
 using namespace std;
 
@@ -29,9 +28,6 @@ class Master
  private:
   Int_t photonnumber;
   Double_t energy;
-  Double_t xposition;
-  Double_t yposition;
-  Double_t zposition;
   Double_t cartposition[3];
   Int_t volumenumber;
   Int_t interactiontype;//0 is nothing,1 is compton,2 is scattering

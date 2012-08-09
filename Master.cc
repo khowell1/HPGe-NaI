@@ -2,7 +2,7 @@
 #include "Master.h"
 //source position and 
 Double_t Master::sourceposition[3]={0.0,0.0,20.0}; //cart position {x,y,z}
-Double_t Master::topspacecylgeometry[3]={0,10.00,20.0};//cyl coords {volnumber,radius,height}
+Double_t Master::topspacecylgeometry[3]={0,20.00,20.0};//cyl coords {volnumber,radius,height}
 Double_t Master::gecylgeometry[3]={1,4.11,6.53};
 Double_t Master::spacecylgeometry[3]={2,4.20,6.53};
 Double_t Master::naicylgeometry[3]={3,10.00,6.53};
@@ -10,7 +10,7 @@ Double_t Master::initialphotonenergy=500; //keV but switched to MeV in initializ
 
 Master::Master() {
   photonsource= new RPhotonSource();
-  photon=new Photon();
+
   geometry=new SetupGeometry();
   string filename="kaitlin_results.root";
   myfile=new TFile(filename.c_str(),"RECREATE");
@@ -51,6 +51,9 @@ Double_t Master::Initializer() {
   photonnumber=0;
   volumenumber=0;
   loopnumber=0;
+  string filename="Ge_cross_notitles.txt";
+  char_file
+  gephoton=new Photon(initialphotonenergy,);
 
   photon->FileReader();//reads Ge mu attenuation coefficient file
 
@@ -62,22 +65,27 @@ Double_t Master::Walk1Photon() {
   photon->SetPhotonEnergy(photonsource->GetPhoton()); //value is from photon source, in MeV
   energy=photon->GetPhotonEnergy(); //for ttree branch
   geometry->SetOriginalPosition(sourceposition);//of course starting at source :)
-  geometry->SetPhotonPosition(cartposition);//puts cart coords in currentcartposition array
+  geometry->SetPhotonPosition(cartposition);//puts cart coords in cartposition array
   photon->SetSplineMu(volumenumber); //finding spline mu for found photon energy
-  newsphaddition[1]=3.1415; //original theta
+  newsphaddition[1]=3.1415926; //original theta
   newsphaddition[2]=0; //original phi
   bool loopcontinue=true; //lets me know whether the loop will continue!
   interactiontype=0;
   outTree->Fill();
+  //initally,the cartposition in both geo and master class, the energy in both classes, the mu in photon class, the interaction type, and theta/phi are declared above.
 
   while (loopcontinue) {//will loop until all energy deposited or escape!
     
     newsphaddition[0]=photon->PhotonStepperSlick(); //find photon walk length
+    cout<<"sphadd:"<<newsphaddition[0]<<","<<newsphaddition[1]<<","<<newsphaddition[2]<<endl;
+
     geometry->SetNewSphAddition(newsphaddition); //find new photon cart position
-    geometry->SetPhotonPosition(cartposition);//sets master class cartposition to geo class one
-    cout<<cartposition[0]<<","<<cartposition[1]<<","<<cartposition[2]<<endl;
-    geometry->PhotonVolumePosition(); //finds which volume the photon is in, if the photon reaches a new volume it will call exitcartposition to find the new cart position at the boundary.
     
+    geometry->SetPhotonPosition(cartposition);//sets master class cartposition to geo class one
+    cout<<"new1:"<<cartposition[0]<<","<<cartposition[1]<<","<<cartposition[2]<<endl;
+    geometry->PhotonVolumePosition(loopnumber); //finds which volume the photon is in, if the photon reaches a new volume it will call exitcartposition to find the new cart position at the boundary.
+    geometry->SetPhotonPosition(cartposition);
+    cout<<"new2:"<<cartposition[0]<<","<<cartposition[1]<<","<<cartposition[2]<<endl;    
     volumenumber=geometry->GetVolumeNumber();//just set volumenumber to geo class's vol number
 
     interactiontype=photon->InteractionFinder(); //finds which interaction occured
@@ -101,6 +109,7 @@ Double_t Master::Walk1Photon() {
       newsphaddition[2]=photon->PhiFinder(); //new random phi direction
 
       photon->SetPhotonEnergy(photon->ComptonEnergyCalc());//new photon energy is from compton
+      energy=photon->GetPhotonEnergy();
 
       if (photon->GetPhotonEnergy()<=0) {//checking that new photon energy is larger than 0
 	cout<<"compton absorbed"<<endl;
@@ -123,6 +132,7 @@ Double_t Master::Walk1Photon() {
 }
 
 void Master::Finisher() {
+  photonsource->ClearPhotons();
   outTree->Write();
   myfile->Close();
 }

@@ -22,9 +22,6 @@ class Photon
 {
  private: //variables
   //static variables
-  static Double_t n_a;
-  static Double_t dx;
-  static Double_t number;
   static Double_t PI;
   static Double_t c;
   static Double_t electron_mass;

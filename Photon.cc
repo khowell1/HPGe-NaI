@@ -2,14 +2,11 @@
 #include "Photon.h"
 
 //static variables
-Double_t Photon::n_a=1.0; //number of interactive objects/volume
-Double_t Photon::dx=0.01; //cm
-Double_t Photon::number=100000; //loop number
 Double_t Photon::PI=3.141592653589793238462;
 Double_t Photon::c=2.9979245800e8; //m/s
 Double_t Photon::electron_mass=9.10938188e-31; //kg
 Double_t Photon::MeV_Jules_convert=1.602e-13; //J
-Double_t Photon::densityarray[4]={10e-16,5.323,10e-16,3.67}; //g/cm^3,vacuum,ge,space,nai
+Double_t Photon::densityarray[4]={10e-16,5.323,10e-16,3.67}; //g/cm^3;vacuum,ge,space,nai
 
 TRandom3 anything; //for getting a random number
 
@@ -22,6 +19,7 @@ Photon::Photon() { //constructor for default photon object
   photonproperties[0]=photon_energy;
   anything.SetSeed(0); //creates the seed
   gRandom->SetSeed(0); //for some other random thing
+  string filename="Ge_cross_notitles.txt";
 }
 
 Photon::Photon(Double_t new_mu,Double_t new_photon_energy) {//constructor for a photon object

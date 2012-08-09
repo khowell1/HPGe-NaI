@@ -25,7 +25,6 @@ class SetupGeometry
   Double_t cartposition[3];//cart position, current  
   Double_t newsphaddition[3];//new positions to go through geo class,will be from photon class
   Double_t cylposition[3];
-
   bool newvolumereached;
 
 
@@ -41,10 +40,11 @@ class SetupGeometry
   void SetPhotonPosition(Double_t currentcartposition[]); //fills an array with cart coords
   void SetNewSphAddition(Double_t new_sphaddition[]);
   void SetCartPosition(); //adds the new spherical info to current cart coords
-  void PhotonVolumePosition();
-  void PhotonExitCartPosition(Int_t old_volume_number);
+  void PhotonVolumePosition(Int_t loopnumber);
+  void SetExitCartPosition(Int_t old_volume_number);
   bool GetNewVolumeReached();
   void SetOriginalPosition(Double_t sourceposition[]);
+  void VolumeChecker(Int_t loopnumber);
 };
 
 #endif

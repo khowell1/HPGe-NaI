@@ -40,6 +40,7 @@ class SetupGeometry
   void SetPhotonPosition(Double_t currentcartposition[]); //fills an array with cart coords
   void SetNewSphAddition(Double_t new_sphaddition[]);
   void SetCartPosition(); //adds the new spherical info to current cart coords
+  void SetCartPosition(Double_t sphaddition[]);//adds a given sphaddition to current cart coords
   void PhotonVolumePosition(Int_t loopnumber);
   void SetExitCartPosition(Int_t old_volume_number);
   bool GetNewVolumeReached();

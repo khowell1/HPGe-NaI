@@ -38,11 +38,19 @@ class Master
   static Double_t spacecylgeometry[3];
   static Double_t naicylgeometry[3];
   static Double_t initialphotonenergy;
+  static Double_t densityarray[4];
+  static string mufiles[2]; //filenames for mu attentuation coefficients
   Double_t newsphaddition[3];
+  string crossfilename;
+
+  
 
  public: //methods
   RPhotonSource *photonsource;
-  Photon *photon;
+  Photon *vacphoton;
+  Photon *gephoton;
+  Photon *spacephoton;
+  Photon *naiphoton;
   SetupGeometry *geometry;
   TFile *myfile;
   TTree *outTree;

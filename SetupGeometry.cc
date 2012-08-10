@@ -36,20 +36,15 @@ void SetupGeometry::SetGeometryData(Double_t new_geometrydata[]) {//sets new geo
   geometrydata[int(new_geometrydata[0])][2]=new_geometrydata[2];
 }
 
-Double_t SetupGeometry::GetGeometryData() {// prints current volume number geometry data
-  cout<<geometrydata[volume_number][0]<<","<<geometrydata[volume_number][1]<<","<<geometrydata[volume_number][2]<<endl;
-  return 0;
-}
-
 void SetupGeometry::SetOriginalPosition(Double_t sourceposition[]) {
-  //sets geo class cartposition array to source position
+  //sets geo class cartposition array to master source position
   cartposition[0]=sourceposition[0];
   cartposition[1]=sourceposition[1];
   cartposition[2]=sourceposition[2];
 }
 
 void SetupGeometry::SetPhotonPosition(Double_t currentcartposition[]) {
-  //sets a given array equal to geo class cart coords
+  //sets a given array from the master class equal to geo class cart coords
   currentcartposition[0]=cartposition[0];
   currentcartposition[1]=cartposition[1];
   currentcartposition[2]=cartposition[2];
@@ -69,9 +64,85 @@ void SetupGeometry::SetCartPosition() { //updates cart position with current sph
   cartposition[2]=cartposition[2]+newsphaddition[0]*cos(newsphaddition[1]);
 }
 
+void SetupGeometry::SetCartPosition(Double_t sphaddition[]) { //updates cart position with a given sphaddition array
+  cartposition[0]=cartposition[0]+sphaddition[0]*sin(sphaddition[1])*cos(sphaddition[2]);
+  cartposition[1]=cartposition[1]+sphaddition[0]*sin(sphaddition[1])*sin(sphaddition[2]);
+  cartposition[2]=cartposition[2]+sphaddition[0]*cos(sphaddition[1]);
+}
+
+void SetupGeometry::SetExitCartPosition(Int_t loopnumber) {
+//finds the geocartposition for current volume number, then finds dr between cartposition and geocartposition, then calls setcartposition with a given sphaddition!
+  Double_t geocartposition[3]={geometrydata[volume_number][1]*cos(newsphaddition[2]),geometrydata[volume_number][1]*sin(newsphaddition[2]),geometrydata[volume_number][2]}; 
+  Double_t dr=sqrt(cartposition[0]*cartposition[0]+cartposition[1]*cartposition[1])-sqrt(geocartposition[0]*geocartposition[0]+geocartposition[1]*geocartposition[1]);
+  Double_t drsphchange[3]={dr,PI,0};
+  SetCartPosition(drsphchange);
+}
+
+bool SetupGeometry::GetNewVolumeReached() {
+  return (newvolumereached); //could just check if a volume change occured in master...
+}
+
+void SetupGeometry::VolumeChecker(Int_t loopnumber) {
+  bool within; 
+  Int_t newvolumenumber=5;
+  for (int n=0;n<3;n++) {
+    Double_t geocartposition[3]={geometrydata[n][1]*cos(newsphaddition[2]),geometrydata[n][1]*sin(newsphaddition[2]),geometrydata[n][2]};
+    for (int i=0;i<2;i++) {
+    	if (abs(cartposition[i])<abs(geocartposition[i])) {
+		within=true;
+      	}
+      	else {
+		within=false;
+      	}
+    }
+    if (within=false) {
+      //then need to move on to the next volume!
+    }
+    else if (within=true) {
+      newvolumenumber=n;
+    }
+  }
+  if (newvolumenumber==5) {
+  	//so escaped! 5 will always mean escape from entire geometry
+  	//will put in master class to check that if returns to volume 1 after the first loop, then needs to end the walking too!
+	SetVolumeNumber(newvolumenumber);
+  }
+  else if (newvolumenumber != volume_number){//so change in volume number! need to change cartposition to boundary
+      SetExitCartPosition(loopnumber);
+      SetVolumeNumber(newvolumenumber);
+      newvolumereached=true; 
+    }
+	else if (newvolumenumber=volume_number) {
+		//no changes!
+  }	
+  else {
+    	//so didn't work! 
+    	SetVolumeNumber(6);
+    }
+}
 
 
-void SetupGeometry::PhotonVolumePosition(Int_t loopnumber) {
+/*Double_t SetupGeometry::GetGeometryData() {// prints current volume number geometry data
+  cout<<geometrydata[volume_number][0]<<","<<geometrydata[volume_number][1]<<","<<geometrydata[volume_number][2]<<endl;
+  return 0;
+}*/
+// void SetupGeometry::SetPhotonPosition(Double_t new_cartposition[]) { //sets new cart position
+//   cartposition[0]=new_cartposition[0];
+//   cartposition[1]=new_cartposition[1];
+//   cartposition[2]=new_cartposition[2];
+// }
+
+// Double_t SetupGeometry::GetPhotonPosition() { //prints current cart position
+//   cout<<"Cart Position: "<<cartposition[0]<<","<<cartposition[1]<<","<<cartposition[2]<<endl;
+//   return 0;
+// }
+
+// Double_t SetupGeometry::GetNewSphAddition() { //prints current sph addition data
+//   //just prints the position, do I actually need to return a position?
+//   cout<<"Newsphaddition:"<<newsphaddition[0]<<","<<newsphaddition[1]<<","<<newsphaddition[2]<<endl;
+//   return 0;
+// }
+/*void SetupGeometry::PhotonVolumePosition(Int_t loopnumber) {
   //sets current photon cyl position, checks if z is negative and if so, returns a volume number of 5.
   newvolumereached=false;
   Int_t old_volume_number=volume_number;//thats ingenious lol, just to see if vol # changes from code!
@@ -119,77 +190,4 @@ void SetupGeometry::PhotonVolumePosition(Int_t loopnumber) {
     SetExitCartPosition(loopnumber);//calls method to find new exit cart coords!
     //make sure new mu's are calculated by giving the new volume number!!!
   }
-}
-
-void SetupGeometry::SetExitCartPosition(Int_t loopnumber) {
-
-    Double_t geocartposition[3]={geometrydata[loopnumber][1]*cos(newsphaddition[2]),geometrydata[loopnumber][1]*sin(newsphaddition[2]),geometrydata[loopnumber][2]}; 
-    Double_t dr=sqrt(cartposition[0]*cartposition[0]+cartposition[1]*cartposition[1])-sqrt(geocartposition[0]*geocartposition[0]+geocartposition[1]*geocartposition[1]);
-
-    Double_t drsphchange[3]={dr,PI/2-2*newsphaddition[1],0};
-    SetNewSphAddition(drsphchange);
-    newvolumereached=true;
-}
-
-bool SetupGeometry::GetNewVolumeReached() {
-  return (newvolumereached);
-}
-
-
-// void SetupGeometry::SetPhotonPosition(Double_t new_cartposition[]) { //sets new cart position
-//   cartposition[0]=new_cartposition[0];
-//   cartposition[1]=new_cartposition[1];
-//   cartposition[2]=new_cartposition[2];
-// }
-
-// Double_t SetupGeometry::GetPhotonPosition() { //prints current cart position
-//   cout<<"Cart Position: "<<cartposition[0]<<","<<cartposition[1]<<","<<cartposition[2]<<endl;
-//   return 0;
-// }
-
-// Double_t SetupGeometry::GetNewSphAddition() { //prints current sph addition data
-//   //just prints the position, do I actually need to return a position?
-//   cout<<"Newsphaddition:"<<newsphaddition[0]<<","<<newsphaddition[1]<<","<<newsphaddition[2]<<endl;
-//   return 0;
-// }
-
-
-void SetupGeometry::VolumeChecker(Int_t loopnumber) {
-  bool within;
-  Int_t newvolumenumber;
-  for (int n=0;n<3;n++) {
-    Double_t geocartposition[3]={geometrydata[n][1]*cos(newsphaddition[2]),geometrydata[n][1]*sin(newsphaddition[2]),geometrydata[n][2]};
-    for (int i=0;i<2;i++) {
-      if (cartposition[i]<geocartposition[i]) {
-	within=true;
-      }
-      else {
-	within=false;
-      }
-    }
-    if (within=false) {
-      //then need to move on to the next volume!
-    }
-    if (within=true) {
-      newvolumenumber=n;
-    }
-  }
-  if (within=true) {
-    if (newvolumenumber!=volume_number) {
-      SetExitCartPosition(loopnumber);
-      SetVolumeNumber(newvolumenumber);
-    }
-    else {
-      //then the volume number and cart position stay the same!
-    }
-  }
-  else if (within=false) {
-    if (loopnumber==0) {
-      SetExitCartPosition(loopnumber);
-      SetVolumeNumber(1);
-    }
-    else {
-      SetVolumeNumber(5);
-    }
-  }
-}
+}*/

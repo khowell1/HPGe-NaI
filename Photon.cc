@@ -6,36 +6,37 @@ Double_t Photon::PI=3.141592653589793238462;
 Double_t Photon::c=2.9979245800e8; //m/s
 Double_t Photon::electron_mass=9.10938188e-31; //kg
 Double_t Photon::MeV_Jules_convert=1.602e-13; //J
-Double_t Photon::densityarray[4]={10e-16,5.323,10e-16,3.67}; //g/cm^3;vacuum,ge,space,nai
-
 TRandom3 anything; //for getting a random number
 
-
-Photon::Photon() { //constructor for default photon object
-  //make the mu so that it uses the interpolation value now!!!!!
-  mu=0.1; //1/cm
-  //  detector_length=10; //cm
+Photon::Photon() { //constructor for default photon object, creates a vacuum photon object
   photon_energy=500; //keV
-  photonproperties[0]=photon_energy;
   anything.SetSeed(0); //creates the seed
   gRandom->SetSeed(0); //for some other random thing
-  string filename="Ge_cross_notitles.txt";
+  density=10e-6;
+  SetMu(10e-6);
 }
 
-Photon::Photon(Double_t new_photon_energy,) {//constructor for a photon object
+Photon::Photon(Double_t new_photon_energy,string filename,Double_t density) {//constructor for a photon object
   photon_energy = new_photon_energy;
-  photonproperties[0]=photon_energy;
   anything.SetSeed(0);
   gRandom->SetSeed(0);
-  string filename=
+  FileReader(filename);
+  SetSplineMu(); //sets mu for volume number 0
+}
+
+Photon::Photon(Double_t new_photon_energy,Double_t new_mu,Double_t density) {//constructor for a photon object
+  photon_energy = new_photon_energy;
+  anything.SetSeed(0);
+  gRandom->SetSeed(0);
+  SetMu(new_mu);
 }
 
 Photon::~Photon() { //deconstructor
   delete mu_spline;
-  delete coherent_spline;
+  //delete coherent_spline;
   delete incoherent_spline;
   delete photoelec_spline;
-  delete pairprod_spline;
+  //  delete pairprod_spline;
   delete thetafinder;
 }
 
@@ -43,13 +44,12 @@ void Photon::SetMu(Double_t new_mu) { //sets mu
   mu=new_mu;
 }
 
-void Photon::SetSplineMu(Int_t volumenumber) { //finds energy_dependent mu from spline, calls spline mu
-  mu=densityarray[volumenumber]*mu_spline->Eval(photon_energy);
+void Photon::SetSplineMu() { //finds energy_dependent mu from spline, calls spline mu
+  mu=density*mu_spline->Eval(photon_energy);
   SetMu(mu);
 }
 
-Double_t Photon::GetMu() { //prints and returns mu
-  cout<<mu<<endl;
+Double_t Photon::GetMu() { //returns mu
   return (mu);
 }
 
@@ -57,22 +57,21 @@ void Photon::SetPhotonEnergy(Double_t new_photon_energy) { //sets photon energy
   photon_energy= new_photon_energy;
 }
 
-Double_t Photon::GetPhotonEnergy() { //prints and returns photon energy
-  //  cout<<photon_energy<<endl;
+Double_t Photon::GetPhotonEnergy() { //returns photon energy
   return (photon_energy);
 }
 
 Double_t Photon::PhotonStepperSlick() { //slick photon depth method, simply gives path length
-  Double_t random_number=anything.Rndm(); 
+  Double_t random_number=anything.Rndm();
   return ((-1/mu)*log(1-random_number)); 
 }
 
 Double_t Photon::InteractionFinder() {
 //uses spline mu's to calc probabilities and then randomly return a type of interaction
-  Double_t photo_mu=photoelec_spline->Eval(photon_energy);
-  //  Double_t coherent_mu=coherent_spline->Eval(photon_energy);
-  Double_t incoherent_mu=incoherent_spline->Eval(photon_energy);
-  //  Double_t pair_mu=pairprod_spline->Eval(photon_energy);
+  Double_t photo_mu=density*photoelec_spline->Eval(photon_energy);
+  //  Double_t coherent_mu=density*coherent_spline->Eval(photon_energy);
+  Double_t incoherent_mu=density*incoherent_spline->Eval(photon_energy);
+  //  Double_t pair_mu=density*pairprod_spline->Eval(photon_energy);
   Double_t total_mu=photo_mu+incoherent_mu;
   Double_t random_num=anything.Rndm();
   if (random_num<((incoherent_mu)/total_mu)) {
@@ -100,11 +99,14 @@ Double_t Photon::PhiFinder() {   //will choose from 2pi!
 Double_t Photon::ComptonEnergyCalc() {//calcs new compton scattering energy
   Double_t new_photon_energy=((photon_energy*MeV_Jules_convert)/(1+(photon_energy*MeV_Jules_convert)/(electron_mass*c*c))*(1-cos(theta)));
   new_photon_energy=new_photon_energy*1/MeV_Jules_convert;
+  SetPhotonEnergy(new_photon_energy);
   return (new_photon_energy);
+
 }
 
 
-void Photon::FileReader(char* filename) { 
+
+void Photon::FileReader(string filename) { 
   vector<Double_t> energy_vector;
   vector<Double_t> coherent_scat_vector;
   vector<Double_t> incoherent_scat_vector;
@@ -123,7 +125,7 @@ void Photon::FileReader(char* filename) {
   Double_t temp_cross_nocoh;  
 
 
-  ifstream myfile("Ge_cross_notitles.txt");
+  ifstream myfile(filename.c_str());
   while (myfile.good()) { //reading in the values from the file into the vectors
     myfile>>temp_energy>>temp_coherent>>temp_incoherent>>temp_photo>>temp_pairnucl>>temp_pairelec>>temp_cross>>temp_cross_nocoh;
     energy_vector.push_back(temp_energy);
@@ -142,7 +144,7 @@ void Photon::FileReader(char* filename) {
   //  coherent_spline= new RLinearInterpolant(energy_vector,coherent_scat_vector);
   incoherent_spline= new RLinearInterpolant(energy_vector,incoherent_scat_vector);
   photoelec_spline= new RLinearInterpolant(energy_vector,photoelectric_vector);
-  pairprod_spline= new RLinearInterpolant(energy_vector,pairprodnucl_vector);
+  //  pairprod_spline= new RLinearInterpolant(energy_vector,pairprodnucl_vector);
 }
 
 

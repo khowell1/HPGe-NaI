@@ -7,10 +7,11 @@ Double_t Master::gecylgeometry[3]={1,4.11,6.53};
 Double_t Master::spacecylgeometry[3]={2,4.20,6.53};
 Double_t Master::naicylgeometry[3]={3,10.00,6.53};
 Double_t Master::initialphotonenergy=500; //keV but switched to MeV in initializer
+Double_t Master::densityarray[4]={10e-16,5.323,10e-16,3.67}; //g/cm^3;vacuum,ge,space,nai
+string Master::mufiles[2]={"Ge_cross_notitles.txt","NaI_cross_notitles.txt"};
 
 Master::Master() {
   photonsource= new RPhotonSource();
-
   geometry=new SetupGeometry();
   string filename="kaitlin_results.root";
   myfile=new TFile(filename.c_str(),"RECREATE");
@@ -19,9 +20,12 @@ Master::Master() {
 
 Master::~Master() {
   delete photonsource;
-  delete photon;
   delete geometry;
   delete myfile;
+  delete vacphoton;
+  delete gephoton;
+  delete spacephoton;
+  delete naiphoton;
 }
 
 Double_t Master::Initializer() {
@@ -51,22 +55,19 @@ Double_t Master::Initializer() {
   photonnumber=0;
   volumenumber=0;
   loopnumber=0;
-  string filename="Ge_cross_notitles.txt";
-  char_file
-  gephoton=new Photon(initialphotonenergy,);
-
-  photon->FileReader();//reads Ge mu attenuation coefficient file
-
+  vacphoton=new Photon(photonsource->GetPhoton(),10e-6,densityarray[0]);
+  gephoton=new Photon(photonsource->GetPhoton(),mufiles[0],densityarray[1]);
+  spacephoton=new Photon(photonsource->GetPhoton(),10e-6,densityarray[2]);
+  naiphoton=new Photon(photonsource->GetPhoton(),mufiles[1],densityarray[3]);
   return 0;
 }
 
 Double_t Master::Walk1Photon() {
 
-  photon->SetPhotonEnergy(photonsource->GetPhoton()); //value is from photon source, in MeV
-  energy=photon->GetPhotonEnergy(); //for ttree branch
+  energy=vacphoton->GetPhotonEnergy(); //for ttree branch
   geometry->SetOriginalPosition(sourceposition);//of course starting at source :)
   geometry->SetPhotonPosition(cartposition);//puts cart coords in cartposition array
-  photon->SetSplineMu(volumenumber); //finding spline mu for found photon energy
+
   newsphaddition[1]=3.1415926; //original theta
   newsphaddition[2]=0; //original phi
   bool loopcontinue=true; //lets me know whether the loop will continue!
@@ -77,8 +78,8 @@ Double_t Master::Walk1Photon() {
   while (loopcontinue) {//will loop until all energy deposited or escape!
     
     newsphaddition[0]=photon->PhotonStepperSlick(); //find photon walk length
-    cout<<"sphadd:"<<newsphaddition[0]<<","<<newsphaddition[1]<<","<<newsphaddition[2]<<endl;
 
+    cout<<"sphadd:"<<newsphaddition[0]<<","<<newsphaddition[1]<<","<<newsphaddition[2]<<endl;
     geometry->SetNewSphAddition(newsphaddition); //find new photon cart position
     
     geometry->SetPhotonPosition(cartposition);//sets master class cartposition to geo class one

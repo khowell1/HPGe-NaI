@@ -7,32 +7,39 @@ Double_t Photon::c=2.9979245800e8; //m/s
 Double_t Photon::electron_mass=9.10938188e-31; //kg
 Double_t Photon::MeV_Jules_convert=1.602e-13; //J
 Double_t Photon::densityarray[4]={10e-16,5.323,10e-16,3.67}; //g/cm^3;vacuum,ge,space,nai
-
 TRandom3 anything; //for getting a random number
-
 
 Photon::Photon() { //constructor for default photon object
   //make the mu so that it uses the interpolation value now!!!!!
-  mu=0.1; //1/cm
-  //  detector_length=10; //cm
+  //mu=0.1; //1/cm
+  //detector_length=10; //cm
   photon_energy=500; //keV
-  photonproperties[0]=photon_energy;
   anything.SetSeed(0); //creates the seed
   gRandom->SetSeed(0); //for some other random thing
-  string filename="Ge_cross_notitles.txt";
+  filename="Ge_cross_notitles.txt"; //filername will be declared in header
+  FileReader(filename);
 }
 
-Photon::Photon(Double_t new_mu,Double_t new_photon_energy) {//constructor for a photon object
-  mu = new_mu;//same here!!!! or have another object constructor that you can change mu with?
+Photon::Photon(Double_t new_photon_energy,string filename) {//constructor for a photon object
+  //mu = new_mu;//same here!!!! or have another object constructor that you can change mu with?
   photon_energy = new_photon_energy;
-  photonproperties[0]=photon_energy;
   anything.SetSeed(0);
   gRandom->SetSeed(0);
+  FileReader(filename);
+  SetSplineMu(0); //sets mu for volume number 0
+}
+
+Photon::Photon(Double_t new_photon_energy,Double_t new_mu) {//constructor for a photon object
+  //mu = new_mu;//same here!!!! or have another object constructor that you can change mu with?
+  photon_energy = new_photon_energy;
+  anything.SetSeed(0);
+  gRandom->SetSeed(0);
+  SetMu(new_mu);
 }
 
 Photon::~Photon() { //deconstructor
   delete mu_spline;
-  delete coherent_spline;
+  //delete coherent_spline;
   delete incoherent_spline;
   delete photoelec_spline;
   delete pairprod_spline;
@@ -104,7 +111,7 @@ Double_t Photon::ComptonEnergyCalc() {//calcs new compton scattering energy
 }
 
 
-void Photon::FileReader() { 
+void Photon::FileReader(string filename) { 
   vector<Double_t> energy_vector;
   vector<Double_t> coherent_scat_vector;
   vector<Double_t> incoherent_scat_vector;
@@ -123,7 +130,7 @@ void Photon::FileReader() {
   Double_t temp_cross_nocoh;  
 
 
-  ifstream myfile("Ge_cross_notitles.txt");
+  ifstream myfile(filename);
   while (myfile.good()) { //reading in the values from the file into the vectors
     myfile>>temp_energy>>temp_coherent>>temp_incoherent>>temp_photo>>temp_pairnucl>>temp_pairelec>>temp_cross>>temp_cross_nocoh;
     energy_vector.push_back(temp_energy);

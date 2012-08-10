@@ -22,12 +22,12 @@ Photon::Photon() { //constructor for default photon object
   string filename="Ge_cross_notitles.txt";
 }
 
-Photon::Photon(Double_t new_mu,Double_t new_photon_energy) {//constructor for a photon object
-  mu = new_mu;//same here!!!! or have another object constructor that you can change mu with?
+Photon::Photon(Double_t new_photon_energy,) {//constructor for a photon object
   photon_energy = new_photon_energy;
   photonproperties[0]=photon_energy;
   anything.SetSeed(0);
   gRandom->SetSeed(0);
+  string filename=
 }
 
 Photon::~Photon() { //deconstructor
@@ -104,7 +104,7 @@ Double_t Photon::ComptonEnergyCalc() {//calcs new compton scattering energy
 }
 
 
-void Photon::FileReader() { 
+void Photon::FileReader(char* filename) { 
   vector<Double_t> energy_vector;
   vector<Double_t> coherent_scat_vector;
   vector<Double_t> incoherent_scat_vector;

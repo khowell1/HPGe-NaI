@@ -33,24 +33,24 @@ class Master
   Int_t interactiontype;//0 is nothing,1 is compton,2 is scattering
   Int_t loopnumber;
   static Double_t sourceposition[3];
-  static Double_t topspacecylgeometry[3];
-  static Double_t gecylgeometry[3];
-  static Double_t spacecylgeometry[3];
-  static Double_t naicylgeometry[3];
+  /* static Double_t topspacecylgeometry[3]; */
+  /* static Double_t gecylgeometry[3]; */
+  /* static Double_t spacecylgeometry[3]; */
+  /* static Double_t naicylgeometry[3]; */
   static Double_t initialphotonenergy;
   static Double_t densityarray[4];
-  static string mufiles[2]; //filenames for mu attentuation coefficients
-  Double_t newsphaddition[3];
-  string crossfilename;
-
-  
+  static Double_t cylradii[4];
+  static Double_t cylheights[4];
+  static string muarray[4]; //filenames for mu attentuation coefficients
+  //  Double_t newsphaddition[3];
 
  public: //methods
   RPhotonSource *photonsource;
-  Photon *vacphoton;
-  Photon *gephoton;
-  Photon *spacephoton;
-  Photon *naiphoton;
+  /* Photon *vacphoton; */
+  /* Photon *gephoton; */
+  /* Photon *spacephoton; */
+  /* Photon *naiphoton; */
+  Photon *photon;
   SetupGeometry *geometry;
   TFile *myfile;
   TTree *outTree;

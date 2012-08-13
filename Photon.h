@@ -26,6 +26,7 @@ class Photon
   static Double_t c;
   static Double_t electron_mass;
   static Double_t MeV_Jules_convert;
+  static TRandom3 anything;
   //variables that are determined from main 
   Double_t photon_energy;
   Double_t mu;

@@ -6,7 +6,7 @@ Double_t Photon::PI=3.141592653589793238462;
 Double_t Photon::c=2.9979245800e8; //m/s
 Double_t Photon::electron_mass=9.10938188e-31; //kg
 Double_t Photon::MeV_Jules_convert=1.602e-13; //J
-TRandom3 anything; //for getting a random number
+TRandom3 Photon::anything;
 
 Photon::Photon() { //constructor for default photon object, creates a vacuum photon object
   photon_energy=500; //keV
@@ -14,6 +14,7 @@ Photon::Photon() { //constructor for default photon object, creates a vacuum pho
   gRandom->SetSeed(0); //for some other random thing
   density=10e-6;
   SetMu(10e-6);
+
 }
 
 Photon::Photon(Double_t new_photon_energy,string filename,Double_t density) {//constructor for a photon object
@@ -124,27 +125,32 @@ void Photon::FileReader(string filename) {
   Double_t temp_cross;
   Double_t temp_cross_nocoh;  
 
+  if (filename.find("txt")!=string::npos) {
+    //   Double_t staticmu=atof(filename.c_str);
+    SetMu(Double_t(atof(filename.c_str())));
+  }
+  else {
+    ifstream myfile(filename.c_str());
+    while (myfile.good()) { //reading in the values from the file into the vectors
+      myfile>>temp_energy>>temp_coherent>>temp_incoherent>>temp_photo>>temp_pairnucl>>temp_pairelec>>temp_cross>>temp_cross_nocoh;
+      energy_vector.push_back(temp_energy);
+      coherent_scat_vector.push_back(temp_coherent);
+      incoherent_scat_vector.push_back(temp_incoherent);
+      photoelectric_vector.push_back(temp_photo);
+      pairprodnucl_vector.push_back(temp_pairnucl);
+      pairprodelec_vector.push_back(temp_pairelec);
+      cross_vector.push_back(temp_cross);
+      cross_nocoher_vector.push_back(temp_cross_nocoh);
+    }    
+    myfile.close();
 
-  ifstream myfile(filename.c_str());
-  while (myfile.good()) { //reading in the values from the file into the vectors
-    myfile>>temp_energy>>temp_coherent>>temp_incoherent>>temp_photo>>temp_pairnucl>>temp_pairelec>>temp_cross>>temp_cross_nocoh;
-    energy_vector.push_back(temp_energy);
-    coherent_scat_vector.push_back(temp_coherent);
-    incoherent_scat_vector.push_back(temp_incoherent);
-    photoelectric_vector.push_back(temp_photo);
-    pairprodnucl_vector.push_back(temp_pairnucl);
-    pairprodelec_vector.push_back(temp_pairelec);
-    cross_vector.push_back(temp_cross);
-    cross_nocoher_vector.push_back(temp_cross_nocoh);
-  }    
-  myfile.close();
-
-  //splines!!!
-  mu_spline= new RLinearInterpolant(energy_vector,cross_vector);
-  //  coherent_spline= new RLinearInterpolant(energy_vector,coherent_scat_vector);
-  incoherent_spline= new RLinearInterpolant(energy_vector,incoherent_scat_vector);
-  photoelec_spline= new RLinearInterpolant(energy_vector,photoelectric_vector);
-  //  pairprod_spline= new RLinearInterpolant(energy_vector,pairprodnucl_vector);
+    //splines!!!
+    mu_spline= new RLinearInterpolant(energy_vector,cross_vector);
+    //  coherent_spline= new RLinearInterpolant(energy_vector,coherent_scat_vector);
+    incoherent_spline= new RLinearInterpolant(energy_vector,incoherent_scat_vector);
+    photoelec_spline= new RLinearInterpolant(energy_vector,photoelectric_vector);
+    //  pairprod_spline= new RLinearInterpolant(energy_vector,pairprodnucl_vector);
+  }
 }
 
 

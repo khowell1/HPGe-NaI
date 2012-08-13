@@ -33,10 +33,16 @@ class SetupGeometry
   SetupGeometry();//default constructor 
   SetupGeometry(Int_t new_volume_number,Double_t new_cyl_radius,Double_t new_cyl_height);
 
+  void SetGeometryDataArray(Int_t n,Double_t new_radius,Double_t new_height);
   void SetVolumeNumber(Int_t new_volume_number);
   Int_t GetVolumeNumber();
+  void SetDistance(Double_t new_distance);
+  Double_t GetDistance();
+  void SetTheta(Double_t new_theta);
+  Double_t GetTheta();
+  void SetPhi(Double_t new_phi);
+  Double_t GetPhi();
   void SetGeometryData(Double_t new_geometrydata[]);
-  Double_t GetGeometryData();
   void SetPhotonPosition(Double_t currentcartposition[]); //fills an array with cart coords
   void SetNewSphAddition(Double_t new_sphaddition[]);
   void SetCartPosition(); //adds the new spherical info to current cart coords
@@ -50,6 +56,7 @@ class SetupGeometry
 
 #endif
 
+  //  Double_t GetGeometryData();
   //  Double_t GetNewSphAddition();
   //  Double_t GetPhotonPosition(); //prints current cart coords
   //  void SetPhotonPosition(Double_t new_cartposition[]);//sets cart position to given coords

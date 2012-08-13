@@ -5,21 +5,29 @@ Double_t SetupGeometry::dr=0.1;
 
 SetupGeometry::SetupGeometry() { //default object constructor
   //only creates the ge detector geometry in the first array position  
-  cyl_radius=4.11; //cm
-  cyl_height=6.53; //cm
   volume_number=0;
-  geometrydata[0][0]=volume_number;
-  geometrydata[0][1]=cyl_radius;
-  geometrydata[0][2]=cyl_height;
+  cyl_radius=20.0; //cm
+  cyl_height=20.0; //cm
+
+  // geometrydata[0][0]=volume_number;
+  // geometrydata[0][1]=cyl_radius;
+  // geometrydata[0][2]=cyl_height;
 }
 
 SetupGeometry::SetupGeometry(Int_t new_volume_number,Double_t new_cyl_radius,Double_t new_cyl_height) { //normal object constructor
+  volume_number=new_volume_number;
   cyl_radius=new_cyl_radius;
   cyl_height=new_cyl_height;
-  volume_number=new_volume_number;
-  geometrydata[new_volume_number][0]=new_volume_number;
-  geometrydata[new_volume_number][1]=new_cyl_radius;
-  geometrydata[new_volume_number][2]=new_cyl_height;
+
+  // geometrydata[new_volume_number][0]=new_volume_number;
+  // geometrydata[new_volume_number][1]=new_cyl_radius;
+  // geometrydata[new_volume_number][2]=new_cyl_height;
+}
+
+void SetupGeometry::SetGeometryDataArray(Int_t n,Double_t new_radius,Double_t new_height) {
+  geometrydata[n][0]=n;
+  geometrydata[n][1]=new_radius;  
+  geometrydata[n][2]=new_height;
 }
 
 void SetupGeometry::SetVolumeNumber(Int_t new_volume_number) {//sets new given volume number
@@ -28,6 +36,30 @@ void SetupGeometry::SetVolumeNumber(Int_t new_volume_number) {//sets new given v
 
 Int_t SetupGeometry::GetVolumeNumber() {//returns current volume number
   return volume_number;
+}
+
+void SetupGeometry::SetDistance(Double_t new_distance) {
+  newsphaddition[0]=new_distance;
+}
+
+Double_t SetupGeometry::GetDistance() {
+  return newsphaddition[0];
+}
+
+void SetupGeometry::SetTheta(Double_t new_theta) {
+  newsphaddition[1]=new_theta;
+}
+
+Double_t SetupGeometry::GetTheta() {
+  return newsphaddition[1];
+}
+
+void SetupGeometry::SetPhi(Double_t new_phi) {
+  newsphaddition[2]=new_phi;
+}
+
+Double_t SetupGeometry::GetPhi() {
+  return newsphaddition[2];
 }
 
 void SetupGeometry::SetGeometryData(Double_t new_geometrydata[]) {//sets new geometry data
